@@ -1,45 +1,39 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import DiscussionCard from '../../components/DiscussionCard.astro';
+import { fetchDiscussions } from '../../lib/github-api';
 import '../../styles/global.css';
+
+const discussions = await fetchDiscussions();
 ---
 
 <Layout title="커뮤니티 게시판">
   <div class="board-container">
-    <h1>커뮤니티 게시판</h1>
-    <p class="subtitle">Sudoremove 커뮤니티에서 자유롭게 소통하세요</p>
-    
-    <div class="board-info">
-      <h2>💬 GitHub Discussions로 이동</h2>
-      <p>우리 커뮤니티의 모든 토론은 GitHub Discussions에서 진행됩니다.</p>
-      <a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank" rel="noopener noreferrer" class="discussion-button">
-        GitHub Discussions 바로가기 →
+    <div class="board-header">
+      <h1>커뮤니티 게시판</h1>
+      <p class="subtitle">Sudoremove 커뮤니티에서 자유롭게 소통하세요</p>
+      <a href="https://github.com/orgs/sudormrf-run/discussions/new/choose" target="_blank" rel="noopener noreferrer" class="new-discussion-btn">
+        ✍️ 새 글 작성
       </a>
     </div>
+    
+    <div class="discussions-list">
+      {discussions.length > 0 ? (
+        discussions.map((discussion) => (
+          <DiscussionCard discussion={discussion} />
+        ))
+      ) : (
+        <div class="no-discussions">
+          <p>아직 작성된 글이 없습니다.</p>
+          <p>첫 번째 글을 작성해보세요!</p>
+        </div>
+      )}
+    </div>
 
-    <div class="features">
-      <h2>커뮤니티 기능</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <span class="feature-icon">📢</span>
-          <h3>Announcements</h3>
-          <p>중요한 공지사항 및 업데이트</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">💬</span>
-          <h3>General</h3>
-          <p>일반적인 토론 및 대화</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">💡</span>
-          <h3>Ideas</h3>
-          <p>새로운 아이디어 제안</p>
-        </div>
-        <div class="feature-card">
-          <span class="feature-icon">🙏</span>
-          <h3>Q&A</h3>
-          <p>질문과 답변</p>
-        </div>
-      </div>
+    <div class="more-link">
+      <a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank" rel="noopener noreferrer">
+        GitHub Discussions에서 더 보기 →
+      </a>
     </div>
   </div>
 </Layout>
@@ -56,6 +50,11 @@ import '../../styles/global.css';
     padding: 2rem;
   }
 
+  .board-header {
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
   h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
@@ -65,76 +64,68 @@ import '../../styles/global.css';
   .subtitle {
     font-size: 1.2rem;
     color: #b8b8b8;
-    margin-bottom: 3rem;
   }
 
-  .board-info {
-    background: #1a0f1f;
-    border: 1px solid #333;
-    border-radius: 0.75rem;
-    padding: 2rem;
-    text-align: center;
-    margin-bottom: 3rem;
-  }
-
-  .board-info h2 {
-    color: #fd7318;
-    margin-bottom: 1rem;
-  }
-
-  .board-info p {
-    color: #b8b8b8;
-    margin-bottom: 1.5rem;
-  }
-
-  .discussion-button {
-    display: inline-block;
+  .new-discussion-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
     background: #fd7318;
     color: white;
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 0.5rem;
     text-decoration: none;
     font-weight: bold;
     transition: all 0.3s ease;
   }
 
-  .discussion-button:hover {
+  .new-discussion-btn:hover {
     background: #43d6a8;
     transform: translateY(-2px);
   }
 
-  .features h2 {
-    color: #fd7318;
-    margin-bottom: 2rem;
+  .discussions-list {
+    margin-bottom: 3rem;
   }
 
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .feature-card {
+  .no-discussions {
+    text-align: center;
+    padding: 4rem 2rem;
     background: #1a0f1f;
     border: 1px solid #333;
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    text-align: center;
+    border-radius: 0.75rem;
   }
 
-  .feature-icon {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  .feature-card h3 {
-    color: #43d6a8;
-    margin-bottom: 0.5rem;
-  }
-
-  .feature-card p {
+  .no-discussions p {
     color: #b8b8b8;
-    font-size: 0.9rem;
+    margin: 0.5rem 0;
+  }
+
+  .more-link {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .more-link a {
+    color: #fd7318;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .more-link a:hover {
+    color: #43d6a8;
+  }
+
+  @media (max-width: 768px) {
+    .board-header {
+      text-align: center;
+    }
+
+    .new-discussion-btn {
+      position: static;
+      display: inline-block;
+      margin-top: 1rem;
+    }
   }
 </style>

@@ -1,0 +1,247 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import Giscus from '../../../components/Giscus.astro';
+import { fetchDiscussion, fetchDiscussions, formatDate } from '../../../lib/github-api';
+import '../../../styles/global.css';
+
+export async function getStaticPaths() {
+  const discussions = await fetchDiscussions();
+  return discussions.map((discussion) => ({
+    params: { number: discussion.number.toString() },
+    props: { discussion }
+  }));
+}
+
+const { number } = Astro.params;
+const { discussion } = Astro.props;
+
+if (!discussion) {
+  return Astro.redirect('/board');
+}
+---
+
+<Layout title={`${discussion.title} - 게시판`}>
+  <div class="discussion-container">
+    <div class="breadcrumb">
+      <a href="/board">← 게시판 목록</a>
+    </div>
+
+    <article class="discussion-content">
+      <div class="discussion-header">
+        <h1>{discussion.title}</h1>
+        <div class="discussion-meta">
+          <img src={discussion.author.avatarUrl} alt={discussion.author.login} class="author-avatar" />
+          <div>
+            <span class="author">{discussion.author.login}</span>
+            <span class="separator">•</span>
+            <span class="date">{formatDate(discussion.createdAt)}</span>
+            {discussion.category && (
+              <>
+                <span class="separator">•</span>
+                <span class="category">
+                  {discussion.category.emoji} {discussion.category.name}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div class="discussion-body" set:html={discussion.bodyHTML}></div>
+
+      <div class="discussion-actions">
+        <a href={discussion.url} target="_blank" rel="noopener noreferrer" class="github-link">
+          GitHub에서 보기 →
+        </a>
+      </div>
+    </article>
+
+    <div class="comments-section">
+      <h2>💬 댓글</h2>
+      <Giscus mapping="number" term={number} />
+    </div>
+  </div>
+</Layout>
+
+<style>
+  body {
+    background: #0d030f !important;
+    color: #ffffff !important;
+  }
+
+  .discussion-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .breadcrumb {
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumb a {
+    color: #fd7318;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb a:hover {
+    color: #43d6a8;
+  }
+
+  .discussion-content {
+    background: #1a0f1f;
+    border: 1px solid #333;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .discussion-header {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #333;
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    line-height: 1.3;
+  }
+
+  .discussion-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #b8b8b8;
+    font-size: 0.9rem;
+  }
+
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .author {
+    font-weight: 500;
+    color: #fd7318;
+  }
+
+  .separator {
+    opacity: 0.5;
+  }
+
+  .category {
+    background: #251730;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+  }
+
+  .discussion-body {
+    color: #e0e0e0;
+    line-height: 1.8;
+    font-size: 1.05rem;
+  }
+
+  /* GitHub 마크다운 스타일 */
+  .discussion-body :global(h1),
+  .discussion-body :global(h2),
+  .discussion-body :global(h3) {
+    color: #ffffff;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .discussion-body :global(p) {
+    margin-bottom: 1rem;
+  }
+
+  .discussion-body :global(a) {
+    color: #fd7318;
+    text-decoration: none;
+  }
+
+  .discussion-body :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  .discussion-body :global(code) {
+    background: #251730;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+  }
+
+  .discussion-body :global(pre) {
+    background: #251730;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
+  .discussion-body :global(blockquote) {
+    border-left: 4px solid #fd7318;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #b8b8b8;
+  }
+
+  .discussion-body :global(ul),
+  .discussion-body :global(ol) {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+  }
+
+  .discussion-body :global(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .discussion-actions {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #333;
+    text-align: right;
+  }
+
+  .github-link {
+    color: #fd7318;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .github-link:hover {
+    color: #43d6a8;
+  }
+
+  .comments-section h2 {
+    color: #fd7318;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .discussion-container {
+      padding: 1rem;
+    }
+
+    .discussion-content {
+      padding: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    .discussion-meta {
+      flex-wrap: wrap;
+    }
+  }
+</style>
