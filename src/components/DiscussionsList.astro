@@ -1,0 +1,161 @@
+---
+// 클라이언트 사이드에서 GitHub API 호출
+---
+
+<div id="discussions-container">
+  <div class="loading">토론 목록을 불러오는 중...</div>
+</div>
+
+<script>
+  async function loadDiscussions() {
+    const container = document.getElementById('discussions-container');
+    
+    try {
+      // GitHub GraphQL API 호출
+      const response = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `
+            query {
+              repository(owner: "sudormrf-run", name: "community") {
+                discussions(first: 10, orderBy: {field: UPDATED_AT, direction: DESC}) {
+                  nodes {
+                    title
+                    url
+                    number
+                    createdAt
+                    author {
+                      login
+                      avatarUrl
+                    }
+                    category {
+                      name
+                      emoji
+                    }
+                    comments {
+                      totalCount
+                    }
+                  }
+                }
+              }
+            }
+          `
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.data?.repository?.discussions?.nodes) {
+        const discussions = data.data.repository.discussions.nodes;
+        
+        container.innerHTML = discussions.map(discussion => `
+          <article class="discussion-item">
+            <div class="discussion-header">
+              <img src="${discussion.author.avatarUrl}" alt="${discussion.author.login}" class="author-avatar" />
+              <div>
+                <h3>
+                  <a href="${discussion.url}" target="_blank" rel="noopener noreferrer" class="discussion-link">
+                    ${discussion.title}
+                    <span class="external-icon">↗</span>
+                  </a>
+                </h3>
+                <div class="meta">
+                  <span>${discussion.author.login}</span>
+                  <span>•</span>
+                  <span>${new Date(discussion.createdAt).toLocaleDateString('ko-KR')}</span>
+                  <span>•</span>
+                  <span>💬 ${discussion.comments.totalCount}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        `).join('');
+      } else {
+        container.innerHTML = '<p>토론을 불러올 수 없습니다.</p>';
+      }
+    } catch (error) {
+      console.error('Failed to load discussions:', error);
+      container.innerHTML = `
+        <div class="error">
+          <p>토론 목록을 불러올 수 없습니다.</p>
+          <a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank">
+            GitHub Discussions에서 직접 보기 →
+          </a>
+        </div>
+      `;
+    }
+  }
+
+  // 페이지 로드 시 토론 목록 불러오기
+  loadDiscussions();
+</script>
+
+<style>
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #b8b8b8;
+  }
+
+  .discussion-item {
+    background: #1a0f1f;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .discussion-item:hover {
+    border-color: #fd7318;
+    transform: translateY(-2px);
+  }
+
+  .discussion-header {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .author-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .discussion-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+
+  .discussion-link:hover {
+    color: #fd7318;
+  }
+
+  .external-icon {
+    font-size: 0.8em;
+    margin-left: 0.3rem;
+    opacity: 0.6;
+  }
+
+  .meta {
+    font-size: 0.85rem;
+    color: #b8b8b8;
+    margin-top: 0.5rem;
+  }
+
+  .error {
+    text-align: center;
+    padding: 2rem;
+    color: #b8b8b8;
+  }
+
+  .error a {
+    color: #fd7318;
+    text-decoration: none;
+  }
+</style>

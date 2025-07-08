@@ -1,5 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import DiscussionsList from '../../components/DiscussionsList.astro';
 import '../../styles/global.css';
 ---
 
@@ -11,41 +12,20 @@ import '../../styles/global.css';
     </div>
     
     <div class="board-actions">
-      <a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank" rel="noopener noreferrer" class="action-card main-link">
-        <span class="icon">💬</span>
-        <h2>GitHub Discussions 바로가기</h2>
-        <p>커뮤니티의 모든 토론을 확인하고 참여하세요</p>
-        <span class="arrow">→</span>
+      <a href="https://github.com/orgs/sudormrf-run/discussions/new/choose" target="_blank" rel="noopener noreferrer" class="new-discussion-btn">
+        ✍️ 새 글 작성
       </a>
-      
-      <div class="sub-actions">
-        <a href="https://github.com/orgs/sudormrf-run/discussions/new/choose" target="_blank" rel="noopener noreferrer" class="action-card new-post">
-          <span class="icon">✍️</span>
-          <h3>새 글 작성</h3>
-          <p>질문, 아이디어, 프로젝트 공유</p>
-        </a>
-        
-        <a href="https://github.com/orgs/sudormrf-run/discussions/categories/announcements" target="_blank" rel="noopener noreferrer" class="action-card announcements">
-          <span class="icon">📢</span>
-          <h3>공지사항</h3>
-          <p>중요한 소식과 업데이트</p>
-        </a>
-        
-        <a href="https://github.com/orgs/sudormrf-run/discussions/categories/q-a" target="_blank" rel="noopener noreferrer" class="action-card qna">
-          <span class="icon">🙏</span>
-          <h3>Q&A</h3>
-          <p>궁금한 점을 물어보세요</p>
-        </a>
-      </div>
     </div>
     
-    <div class="board-info">
-      <h2>💡 커뮤니티 이용 안내</h2>
-      <ul>
-        <li>GitHub 계정으로 로그인하면 모든 기능을 사용할 수 있습니다</li>
-        <li>마크다운 문법을 사용하여 코드, 이미지, 링크 등을 공유할 수 있습니다</li>
-        <li>서로 존중하며 건설적인 피드백을 공유해주세요</li>
-      </ul>
+    <div class="discussions-section">
+      <h2>최근 토론</h2>
+      <DiscussionsList />
+    </div>
+    
+    <div class="more-actions">
+      <a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank" rel="noopener noreferrer">
+        GitHub Discussions에서 더 보기 →
+      </a>
     </div>
   </div>
 </Layout>
@@ -79,115 +59,48 @@ import '../../styles/global.css';
   }
 
   .board-actions {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .new-discussion-btn {
+    display: inline-block;
+    background: #fd7318;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+  }
+
+  .new-discussion-btn:hover {
+    background: #43d6a8;
+    transform: translateY(-2px);
+  }
+
+  .discussions-section {
     margin-bottom: 3rem;
   }
 
-  .action-card {
-    display: block;
-    background: #1a0f1f;
-    border: 1px solid #333;
-    border-radius: 0.75rem;
-    padding: 2rem;
-    text-decoration: none;
-    color: #ffffff;
-    position: relative;
-    transition: all 0.3s ease;
-    overflow: hidden;
-  }
-
-  .action-card:hover {
-    border-color: #fd7318;
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(253, 115, 24, 0.2);
-  }
-
-  .main-link {
+  .discussions-section h2 {
+    color: #fd7318;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, #1a0f1f, #251730);
   }
 
-  .main-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #fd7318, #43d6a8);
-  }
-
-  .sub-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-  }
-
-  .action-card .icon {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  .action-card h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #fd7318;
-  }
-
-  .action-card h3 {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    color: #43d6a8;
-  }
-
-  .action-card p {
-    color: #b8b8b8;
-    margin: 0;
-    font-size: 0.95rem;
-  }
-
-  .arrow {
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    font-size: 2rem;
-    color: #fd7318;
-    transition: transform 0.3s ease;
-  }
-
-  .action-card:hover .arrow {
-    transform: translateX(5px);
-  }
-
-  .board-info {
-    background: #1a0f1f;
-    border: 1px solid #333;
-    border-radius: 0.75rem;
+  .more-actions {
+    text-align: center;
     padding: 2rem;
   }
 
-  .board-info h2 {
+  .more-actions a {
     color: #fd7318;
-    margin-bottom: 1rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
   }
 
-  .board-info ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .board-info li {
-    padding: 0.5rem 0;
-    padding-left: 1.5rem;
-    position: relative;
-    color: #b8b8b8;
-  }
-
-  .board-info li:before {
-    content: "✓";
-    position: absolute;
-    left: 0;
+  .more-actions a:hover {
     color: #43d6a8;
   }
 
