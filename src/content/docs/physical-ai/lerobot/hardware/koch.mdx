@@ -1,25 +1,157 @@
 ---
 title: 'Koch v1.1'
-description: 'Koch v1.1 교육용 로봇 키트 가이드'
+description: 'Koch v1.1 저비용 로봇 팔 가이드'
 ---
 
 import Callout from '../../../../../components/Callout.astro';
+import Tabs from '../../../../../components/Tabs.astro';
 
 # Koch v1.1
 
-<Callout type="info" title="준비 중">
-  이 페이지는 현재 준비 중입니다. 곧 업데이트될 예정입니다!
+Koch v1.1은 Alexander Koch의 오리지널 저비용 로봇 디자인을 개선한 버전입니다. 연구와 학습을 위한 경제적이고 모듈형 설계의 로봇 팔로, LeRobot과 완벽하게 호환됩니다.
+
+<Callout type="tip" title="두 가지 버전">
+  Koch 로봇에는 두 가지 버전이 있습니다:
+  - **오리지널**: Alexander Koch의 첫 번째 디자인
+  - **v1.1**: Jess Moss의 개선된 버전
 </Callout>
 
-Koch v1.1 교육용 로봇 키트에 대한 상세한 가이드가 곧 제공될 예정입니다.
+## 🔧 주요 개선사항 (v1.1)
 
-## 예정된 콘텐츠
+### 하드웨어 개선
+- 나사 간섭 문제 해결
+- 표준화된 구멍 크기
+- 플라스틱에 직접 나사를 고정하는 방식 제거
+- 리더 로봇에 보드 플랫폼 추가
+- 팔로워 로봇의 바닥 물체 집기 플랫폼 추가
 
-- Koch v1.1 키트 구성품
-- 조립 가이드
-- LeRobot 설정 방법
-- 교육 활용 예시
+### 제작 편의성
+- **납땜 불필요**: 모든 연결이 커넥터로 가능
+- **SolidWorks 모델 제공**: CAD 파일로 수정 가능
+- **배선 다이어그램**: 명확한 연결 가이드
+- **조립 영상**: 애니메이션 포함 상세 가이드
+
+## 💰 비용 분석
+
+<Tabs tabs={['Koch v1.1', '오리지널 Koch']}>
+  <div class="tab-panel">
+    ### 리더 암 (Leader Arm)
+    - 6x Dynamixel XL330-M077-T 서보
+    - Waveshare 서보 드라이버 보드
+    - 5V 전원 공급장치
+    - **예상 비용**: $199-$305
+    
+    ### 팔로워 암 (Follower Arm)
+    - 2x Dynamixel XL430-W250-T 서보
+    - 4x Dynamixel XL330-M288-T 서보
+    - Waveshare 서보 드라이버 보드
+    - 12V 전원 공급장치
+    - **예상 비용**: $278-$368
+    
+    **총 시스템 비용**: 약 $477-$673
+  </div>
+  <div class="tab-panel">
+    ### 리더 암
+    - **예상 비용**: 약 $183
+    
+    ### 팔로워 암
+    - **예상 비용**: 약 $258
+    
+    **총 시스템 비용**: 약 $430
+  </div>
+</Tabs>
+
+## 🛠️ 제작 가이드
+
+### 3D 프린팅 설정
+
+```
+• 레이어 높이: 0.2mm
+• 노즐 직경: 0.4mm (최대)
+• 인필 밀도: ~30%
+• 권장 소재: PLA+, ABS, PETG
+```
+
+### 전원 요구사항
+
+<Callout type="warning">
+  전원 공급 전압에 주의하세요:
+  - **리더 암**: 5V
+  - **팔로워 암**: 12V
+</Callout>
+
+### 연결
+- 두 암은 USB-C로 컴퓨터에 연결
+- 각 암은 독립적인 전원 공급 필요
+
+## 🚀 소프트웨어 설정
+
+### LeRobot 통합
+
+```bash
+# LeRobot 설치
+pip install lerobot
+
+# Dynamixel SDK 설치
+pip install dynamixel_sdk
+
+# Koch 로봇 연결 테스트
+python -m lerobot.scripts.find_devices
+```
+
+### 기본 제어 예제
+
+```python
+from lerobot import KochRobot
+
+# 로봇 초기화
+robot = KochRobot()
+robot.connect()
+
+# 텔레오퍼레이션 시작
+robot.start_teleoperation()
+```
+
+## 🎯 응용 분야
+
+### 연구 및 개발
+- **로봇 학습**: 저비용으로 ML/AI 실험
+- **시뮬레이션**: MuJoCo 통합 지원
+- **협업 로봇**: 두 팔을 이용한 작업
+
+### 실제 응용
+- 물체 조작 및 픽앤플레이스
+- 의류 접기 등 정밀 작업
+- 교육 및 훈련 플랫폼
+
+## 🔑 핵심 특징
+
+### 모듈형 설계
+- 리더/팔로워 구성 분리
+- 부품별 교체 가능
+- 확장 가능한 구조
+
+### 경량화
+- XL330 서보: 단 18g
+- 빠른 움직임 가능
+- 효율적인 전력 소비
+
+## 📚 리소스
+
+### Koch v1.1
+- [GitHub 저장소](https://github.com/jess-moss/koch-v1-1)
+- [조립 영상](https://github.com/jess-moss/koch-v1-1#assembly)
+- [BOM 및 3D 파일](https://github.com/jess-moss/koch-v1-1/tree/main)
+
+### 오리지널 Koch
+- [GitHub 저장소](https://github.com/AlexanderKoch-Koch/low_cost_robot)
+- [설계 문서](https://github.com/AlexanderKoch-Koch/low_cost_robot/blob/main/README.md)
+
+<Callout type="success">
+  Koch 로봇은 저비용으로 로봇공학을 시작하기에 완벽한 플랫폼입니다.
+  활발한 오픈소스 커뮤니티에서 지원을 받을 수 있습니다!
+</Callout>
 
 ---
 
-*업데이트 소식은 [커뮤니티](/community/board)에서 확인하세요.*
+*Koch 로봇 프로젝트는 지속적으로 발전하고 있습니다. 최신 업데이트는 각 GitHub 저장소를 확인하세요.*
