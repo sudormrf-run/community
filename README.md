@@ -1,34 +1,35 @@
-# Sudoremove Community
+# SUDO REMOVE Community
 
-Sudoremove 브랜드의 공식 커뮤니티 사이트입니다. AI 교육과 커뮤니티 활동을 중심으로 한 통합 플랫폼을 제공합니다.
+SUDO REMOVE 브랜드의 공식 커뮤니티 사이트입니다. 함께 만들고 바로 따라할 수 있는 AI 프로젝트 플랫폼을 제공합니다.
 
 ## 🚀 프로젝트 개요
 
-- **브랜드**: Sudoremove
+- **브랜드**: SUDO REMOVE
 - **슬로건**: "AI의 문턱을 낮추다"
 - **URL**: https://sudoremove.github.io/community
+- **YouTube**: [@sudoremove](https://youtube.com/@sudoremove)
+- **GitHub**: [sudormrf-run](https://github.com/sudormrf-run)
 
 ## 📁 프로젝트 구조
 
 ```text
 /
 ├── public/             # 정적 자산
-│   ├── favicon.svg
-│   └── images/        # 이미지 파일
+│   └── sudormrf.jpg   # 로고 이미지
 ├── src/
-│   ├── components/    # Astro 컴포넌트
-│   │   └── Giscus.astro
 │   ├── content/       # MDX 콘텐츠
 │   │   ├── config.ts
 │   │   └── docs/      # 문서 콘텐츠
+│   │       └── physical-ai/  # Physical AI 튜토리얼
 │   ├── layouts/       # 레이아웃 컴포넌트
 │   │   ├── Layout.astro
 │   │   └── DocsLayout.astro
 │   ├── pages/         # 페이지 라우트
 │   │   ├── index.astro      # 홈
 │   │   ├── docs/            # 문서
-│   │   ├── board/           # 게시판
-│   │   └── archive/         # 행사
+│   │   ├── archive/         # 행사
+│   │   ├── events/          # 행사 (리다이렉트)
+│   │   └── people/          # People
 │   └── styles/        # 스타일 파일
 └── astro.config.mjs   # Astro 설정
 ```
@@ -39,16 +40,17 @@ Sudoremove 브랜드의 공식 커뮤니티 사이트입니다. AI 교육과 커
 - 다크 테마 기반 UI/UX
 - 반응형 디자인
 - MDX 기반 문서 시스템
-- Giscus 게시판 (GitHub Issues 연동)
+- YouTube 콘텐츠 임베드 (팟캐스트, 미니 다큐)
+- GitHub Discussions 연동 게시판
 - 행사 갤러리 페이지
+- People 페이지
 - GitHub Pages 배포
 
 ### 개발 예정 📋
-- Physical AI 튜토리얼 콘텐츠
-- LLM 강의 아카이브 콘텐츠
+- Physical AI 튜토리얼 콘텐츠 확충
 - GitHub Actions 자동화
 - 외부 채널 알림 (Slack, Discord, 카카오톡)
-- 뉴스레터 시스템
+- Shop 페이지 오픈
 
 ## 🛠️ 개발 환경 설정
 
