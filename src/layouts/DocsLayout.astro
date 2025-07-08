@@ -70,13 +70,19 @@ const navigation = [
           <nav class="sidebar-nav">
             {navigation.map((section) => (
               <div class="nav-section">
-                <h3>{section.title}</h3>
+                <h3>
+                  <i class={section.title === 'Physical AI' ? 'fas fa-robot' : 'fas fa-brain'}></i>
+                  {section.title}
+                </h3>
                 <ul>
                   {section.items.map((item) => (
                     <li>
                       {item.items ? (
                         <>
-                          <span class="nav-group-title">{item.title}</span>
+                          <span class="nav-group-title">
+                            <i class="fas fa-folder"></i>
+                            {item.title}
+                          </span>
                           <ul class="nav-group">
                             {item.items.map((subItem) => (
                               <li>
@@ -84,6 +90,7 @@ const navigation = [
                                   href={subItem.href} 
                                   class={currentPath === subItem.href ? 'active' : ''}
                                 >
+                                  <i class="fas fa-file-alt"></i>
                                   {subItem.title}
                                 </a>
                               </li>
@@ -95,6 +102,7 @@ const navigation = [
                           href={item.href}
                           class={currentPath === item.href ? 'active' : ''}
                         >
+                          <i class="fas fa-file-alt"></i>
                           {item.title}
                         </a>
                       )}
