@@ -12,17 +12,29 @@ const currentPath = Astro.url.pathname;
 // 네비게이션 구조
 const navigation = [
   {
-    title: 'Physical AI',
+    title: 'LeRobot',
     items: [
-      { title: '개요', href: '/community/docs/physical-ai/overview' },
+      { title: '소개', href: '/community/docs/physical-ai/lerobot/intro' },
+      { title: '시작하기', href: '/community/docs/physical-ai/lerobot/getting-started' },
       {
-        title: 'LeRobot',
+        title: '하드웨어',
         items: [
-          { title: '소개', href: '/community/docs/physical-ai/lerobot/intro' },
-          { title: '시작하기', href: '/community/docs/physical-ai/lerobot/getting-started' },
-          { title: '하드웨어 가이드', href: '/community/docs/physical-ai/lerobot/hardware' },
-          { title: '핵심 개념', href: '/community/docs/physical-ai/lerobot/concepts' },
-          { title: '튜토리얼', href: '/community/docs/physical-ai/lerobot/tutorials' },
+          { title: '선택 가이드', href: '/community/docs/physical-ai/lerobot/hardware' },
+          { title: 'SO-101 Arm', href: '/community/docs/physical-ai/lerobot/hardware/so-101' },
+          { title: 'Koch v1.1', href: '/community/docs/physical-ai/lerobot/hardware/koch' },
+        ]
+      },
+      {
+        title: '튜토리얼',
+        items: [
+          { title: 'SO-101로 Imitation Learning', href: '/community/docs/physical-ai/lerobot/tutorials' },
+        ]
+      },
+      {
+        title: 'Policy',
+        items: [
+          { title: 'ACT', href: '/community/docs/physical-ai/lerobot/policy/act' },
+          { title: 'SmolVLA', href: '/community/docs/physical-ai/lerobot/policy/smolvla' },
         ]
       }
     ]
