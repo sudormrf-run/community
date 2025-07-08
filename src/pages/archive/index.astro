@@ -223,6 +223,14 @@ import Layout from '../../layouts/Layout.astro';
   .event-card.past .event-info h3 {
     margin-bottom: 0.25rem;
     color: white;
+    white-space: normal; /* Ensure text wraps */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    line-height: 1.2; /* Adjust line height for better fit */
+    font-size: 1.1rem; /* Slightly reduce font size if needed */
   }
 
   .event-card.past .event-date-text {
