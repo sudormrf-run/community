@@ -7,11 +7,6 @@ import Layout from '../../layouts/Layout.astro';
     <h1>문서</h1>
     <p class="subtitle">Sudoremove의 AI 교육 자료와 튜토리얼</p>
     
-    <div class="notice">
-      <p>📚 새로운 문서 사이트가 준비되었습니다!</p>
-      <a href="/community/docs/" class="btn btn-primary">새 문서 사이트로 이동</a>
-    </div>
-    
     <section class="docs-section">
       <h2>LeRobot</h2>
       <div class="docs-grid">
@@ -150,47 +145,6 @@ import Layout from '../../layouts/Layout.astro';
   }
 
 
-  .notice {
-    background: linear-gradient(135deg, var(--color-accent-light) 0%, rgba(253, 115, 24, 0.05) 100%);
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-10);
-    text-align: center;
-    margin-bottom: var(--spacing-12);
-    box-shadow: 0 0 40px rgba(253, 115, 24, 0.1);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .notice::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(253, 115, 24, 0.1) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.3; }
-  }
-
-  .notice p {
-    font-size: var(--text-xl);
-    font-weight: var(--font-medium);
-    margin-bottom: var(--spacing-4);
-    position: relative;
-    z-index: 1;
-  }
-  
-  .notice .btn {
-    position: relative;
-    z-index: 1;
-  }
-  
   /* 모바일 반응형 */
   @media (max-width: 768px) {
     .docs-container {
