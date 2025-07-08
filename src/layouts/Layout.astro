@@ -6,7 +6,7 @@ export interface Props {
   description?: string;
 }
 
-const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' } = Astro.props;
+const { title, description = 'SUDO REMOVE Community - AI의 문턱을 낮추다' } = Astro.props;
 ---
 
 <!doctype html>
@@ -22,14 +22,15 @@ const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' 
     <nav>
       <div class="nav-container">
         <a href="/community/" class="logo">
-          <img src="/community/sudormrf.jpg" alt="Sudoremove" width="40" height="40" style="border-radius: 50%;" />
-          <span>Sudoremove</span>
+          <img src="/community/sudormrf.jpg" alt="SUDO REMOVE" width="40" height="40" style="border-radius: 50%;" />
+          <span class="logo-text">sudo rm -rf<span class="cursor">_</span></span>
         </a>
         <ul class="nav-links">
           <li><a href="/community/">홈</a></li>
           <li><a href="/community/docs">문서</a></li>
           <li><a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank">게시판</a></li>
           <li><a href="/community/archive">행사</a></li>
+          <li><a href="/community/people">People</a></li>
           <li><a href="https://shop.sudoremove.com" target="_blank">Shop</a></li>
           <li><a href="https://blog.sudoremove.com" target="_blank">Blog</a></li>
         </ul>
@@ -113,13 +114,23 @@ const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' 
     filter: drop-shadow(0 0 10px rgba(253, 115, 24, 0.5));
   }
   
-  .logo span {
-    font-size: 1.5rem;
-    font-weight: bold;
-    background: linear-gradient(45deg, var(--color-orange), var(--color-yellow));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .logo-text {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-green);
+    letter-spacing: 0.05em;
+  }
+  
+  .cursor {
+    animation: blink 1s infinite;
+    color: var(--color-green);
+    font-weight: 800;
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
   }
 
   .nav-links {
