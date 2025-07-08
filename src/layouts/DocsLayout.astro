@@ -56,25 +56,28 @@ const navigation = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/jpeg" href="/community/sudormrf.jpg" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism-themes/1.9.0/prism-one-dark.min.css">
-    <title>{title} | Sudoremove Docs</title>
+    <title>{title} | SUDO REMOVE Docs</title>
   </head>
   <body>
     <div class="docs-layout">
       <!-- 헤더 -->
-      <header class="docs-header">
-        <div class="header-content">
+      <nav class="docs-nav">
+        <div class="nav-container">
           <a href="/community/" class="logo">
-            <img src="/community/sudormrf.jpg" alt="Sudoremove" width="40" height="40" style="border-radius: 50%;" />
-            <span>Sudoremove</span>
+            <img src="/community/sudormrf.jpg" alt="SUDO REMOVE" width="40" height="40" style="border-radius: 50%;" />
+            <span class="logo-text">sudo rm -rf<span class="cursor">_</span></span>
           </a>
-          <nav class="header-nav">
-            <a href="/community/">홈</a>
-            <a href="/community/docs">문서</a>
-            <a href="/community/board">게시판</a>
-            <a href="/community/archive">행사</a>
-          </nav>
+          <ul class="nav-links">
+            <li><a href="/community/">홈</a></li>
+            <li><a href="/community/docs">문서</a></li>
+            <li><a href="https://github.com/orgs/sudormrf-run/discussions" target="_blank">게시판</a></li>
+            <li><a href="/community/archive">행사</a></li>
+            <li><a href="/community/people">People</a></li>
+            <li><a href="#" onclick="alert('Coming Soon!'); return false;">Shop</a></li>
+            <li><a href="https://sudormrf.run" target="_blank">Blog</a></li>
+          </ul>
         </div>
-      </header>
+      </nav>
 
       <div class="docs-container">
         <!-- 사이드바 -->
@@ -138,11 +141,15 @@ const navigation = [
 </html>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap');
+  
   :root {
     --sidebar-width: 280px;
     --header-height: 70px;
+    --nav-height: 70px;
     --docs-bg: #0d030f;
     --sidebar-bg: rgba(13, 3, 15, 0.95);
+    --header-bg: rgba(13, 3, 15, 0.95);
   }
 
   * {
@@ -162,28 +169,28 @@ const navigation = [
     background: #0d030f;
   }
 
-  /* 헤더 */
-  .docs-header {
+  /* 네비게이션 - 메인 레이아웃과 동일한 스타일 */
+  .docs-nav {
+    background: var(--header-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(253, 115, 24, 0.2);
+    height: var(--nav-height);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: var(--header-height);
-    background: rgba(13, 3, 15, 0.98);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(253, 115, 24, 0.2);
     z-index: 100;
     box-shadow: 0 2px 20px rgba(253, 115, 24, 0.1);
   }
 
-  .header-content {
-    max-width: 1400px;
+  .nav-container {
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
-    height: 100%;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
+    height: 100%;
   }
 
   .logo {
@@ -191,49 +198,84 @@ const navigation = [
     align-items: center;
     gap: 0.75rem;
     text-decoration: none;
+    transition: transform 0.2s;
+  }
+  
+  .logo:hover {
+    transform: scale(1.05);
   }
   
   .logo img {
     filter: drop-shadow(0 0 10px rgba(253, 115, 24, 0.5));
   }
   
-  .logo span {
-    font-size: 1.5rem;
-    font-weight: bold;
-    background: linear-gradient(45deg, var(--color-orange), var(--color-yellow));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  .logo-text {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--color-green);
+    letter-spacing: 0.05em;
+  }
+  
+  .cursor {
+    animation: blink 1s infinite;
+    color: var(--color-green);
+    font-weight: 800;
+  }
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
   }
 
-  .header-nav {
+  .nav-links {
     display: flex;
+    list-style: none;
     gap: 2rem;
   }
 
-  .header-nav a {
-    color: #ffffff;
+  .nav-links a {
+    color: var(--color-text-muted);
     text-decoration: none;
-    transition: color 0.3s;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    position: relative;
   }
 
-  .header-nav a:hover {
-    color: var(--accent-color);
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--color-orange);
+    transition: all 0.3s;
+    transform: translateX(-50%);
+  }
+
+  .nav-links a:hover {
+    color: var(--color-orange);
+  }
+  
+  .nav-links a:hover::after {
+    width: 80%;
   }
 
   /* 메인 컨테이너 */
   .docs-container {
     display: flex;
-    padding-top: var(--header-height);
+    padding-top: var(--nav-height);
   }
 
   /* 사이드바 */
   .docs-sidebar {
     position: fixed;
     left: 0;
-    top: var(--header-height);
+    top: var(--nav-height);
     width: var(--sidebar-width);
-    height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--nav-height));
     background: var(--sidebar-bg);
     border-right: 1px solid rgba(253, 115, 24, 0.1);
     overflow-y: auto;
