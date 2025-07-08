@@ -1,351 +1,57 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { boardCategories } from '../../data/board-categories';
+import Giscus from '../../components/Giscus.astro';
 import '../../styles/global.css';
 ---
 
 <Layout title="커뮤니티 게시판">
   <div class="board-container">
-    <div class="board-header">
-      <h1>커뮤니티 게시판</h1>
-      <p class="subtitle">AI의 문턱을 함께 낮추는 공간</p>
-    </div>
+    <h1>커뮤니티 게시판</h1>
+    <p class="subtitle">Sudoremove 커뮤니티에서 자유롭게 소통하세요</p>
     
-    <div class="board-stats">
-      <div class="stat-card">
-        <span class="stat-emoji">👥</span>
-        <div>
-          <h3>활발한 커뮤니티</h3>
-          <p>함께 성장하는 AI 개발자들</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-emoji">🎯</span>
-        <div>
-          <h3>실전 프로젝트</h3>
-          <p>Physical AI부터 LLM까지</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-emoji">📖</span>
-        <div>
-          <h3>지식 공유</h3>
-          <p>모두가 함께 배우는 공간</p>
-        </div>
-      </div>
+    <div class="board-notice">
+      <p>💡 GitHub 계정으로 로그인하면 토론에 참여할 수 있습니다</p>
     </div>
 
-    <div class="categories-section">
-      <h2>카테고리별 게시판</h2>
-      <p class="section-desc">관심 있는 주제의 게시판을 선택하세요</p>
-      
-      <div class="category-grid">
-        {boardCategories.map((category) => (
-          <a href={`/board/${category.slug}`} class="category-card">
-            <div class="card-header">
-              <span class="category-emoji">{category.emoji}</span>
-              <h3>{category.name}</h3>
-            </div>
-            <p>{category.description}</p>
-            <span class="card-arrow">→</span>
-          </a>
-        ))}
-      </div>
-    </div>
-
-    <div class="board-guide">
-      <h2>커뮤니티 가이드라인</h2>
-      <div class="guide-grid">
-        <div class="guide-item">
-          <span class="guide-icon">🤝</span>
-          <h4>서로 존중하기</h4>
-          <p>모든 구성원을 존중하고 배려해주세요</p>
-        </div>
-        <div class="guide-item">
-          <span class="guide-icon">💡</span>
-          <h4>건설적인 피드백</h4>
-          <p>긍정적이고 도움이 되는 피드백을 공유해주세요</p>
-        </div>
-        <div class="guide-item">
-          <span class="guide-icon">🔍</span>
-          <h4>검색 먼저</h4>
-          <p>질문 전에 기존 토론을 검색해보세요</p>
-        </div>
-        <div class="guide-item">
-          <span class="guide-icon">📝</span>
-          <h4>명확한 제목</h4>
-          <p>토론 주제를 명확하게 표현해주세요</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="cta-section">
-      <h2>🚀 지금 바로 참여하세요!</h2>
-      <p>GitHub 계정으로 로그인하여 토론에 참여할 수 있습니다</p>
-      <a href="/board/general" class="cta-button">자유게시판 바로가기</a>
-    </div>
+    <Giscus />
   </div>
 </Layout>
 
 <style>
-  :root {
-    --primary-color: #1a0f1f;
-    --secondary-color: #251730;
-    --accent-color: #fd7318;
-    --accent-green: #43d6a8;
-    --text-color: #ffffff;
-    --text-muted: #b8b8b8;
-    --border-color: #333;
-  }
-  
   body {
     background: #0d030f !important;
     color: #ffffff !important;
   }
   
   .board-container {
-    max-width: 1200px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 2rem;
   }
 
-  .board-header {
-    text-align: center;
-    margin-bottom: 4rem;
-  }
-
-  .board-header h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-green));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: #fd7318;
   }
 
   .subtitle {
-    font-size: 1.3rem;
-    color: var(--text-muted);
-  }
-
-  /* 통계 섹션 */
-  .board-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 4rem;
-  }
-
-  .stat-card {
-    background: var(--primary-color);
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: transform 0.2s, border-color 0.2s;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent-color);
-  }
-
-  .stat-emoji {
-    font-size: 2.5rem;
-  }
-
-  .stat-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-card p {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
-  }
-
-  /* 카테고리 섹션 */
-  .categories-section {
-    margin-bottom: 4rem;
-  }
-
-  .categories-section h2 {
-    font-size: 2rem;
-    color: var(--accent-color);
-    margin-bottom: 0.5rem;
-  }
-
-  .section-desc {
-    color: var(--text-muted);
+    font-size: 1.2rem;
+    color: #b8b8b8;
     margin-bottom: 2rem;
   }
 
-  .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .category-card {
-    background: var(--secondary-color);
-    border: 1px solid var(--border-color);
-    border-radius: 0.75rem;
-    padding: 2rem;
-    text-decoration: none;
-    color: var(--text-color);
-    display: block;
-    position: relative;
-    transition: all 0.3s ease;
-    overflow: hidden;
-  }
-
-  .category-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent-color), var(--accent-green));
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-  }
-
-  .category-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(253, 115, 24, 0.2);
-    border-color: var(--accent-color);
-  }
-
-  .category-card:hover::before {
-    transform: translateX(0);
-  }
-
-  .category-card:hover .card-arrow {
-    transform: translateX(5px);
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .category-emoji {
-    font-size: 2rem;
-  }
-
-  .category-card h3 {
-    font-size: 1.3rem;
-    margin: 0;
-  }
-
-  .category-card p {
-    color: var(--text-muted);
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  .card-arrow {
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    font-size: 1.5rem;
-    color: var(--accent-color);
-    transition: transform 0.3s ease;
-  }
-
-  /* 가이드라인 섹션 */
-  .board-guide {
-    background: var(--primary-color);
-    border-radius: 1rem;
-    padding: 3rem;
-    margin-bottom: 4rem;
-  }
-
-  .board-guide h2 {
-    color: var(--accent-color);
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .guide-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-  }
-
-  .guide-item {
-    text-align: center;
-  }
-
-  .guide-icon {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 1rem;
-  }
-
-  .guide-item h4 {
-    margin-bottom: 0.5rem;
-    color: var(--accent-green);
-  }
-
-  .guide-item p {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
-
-  /* CTA 섹션 */
-  .cta-section {
-    text-align: center;
-    padding: 3rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 1rem;
-    border: 1px solid var(--border-color);
-  }
-
-  .cta-section h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-
-  .cta-section p {
-    color: var(--text-muted);
-    margin-bottom: 2rem;
-  }
-
-  .cta-button {
-    display: inline-block;
-    padding: 1rem 2.5rem;
-    background: var(--accent-color);
-    color: white;
-    text-decoration: none;
+  .board-notice {
+    background: #1a0f1f;
+    border: 1px solid #333;
     border-radius: 0.5rem;
-    font-weight: bold;
-    transition: all 0.3s ease;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
   }
 
-  .cta-button:hover {
-    background: var(--accent-green);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(67, 214, 168, 0.3);
-  }
-
-  @media (max-width: 768px) {
-    .board-header h1 {
-      font-size: 2rem;
-    }
-    
-    .category-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .board-guide {
-      padding: 2rem 1rem;
-    }
+  .board-notice p {
+    margin: 0;
+    color: #b8b8b8;
   }
 </style>
