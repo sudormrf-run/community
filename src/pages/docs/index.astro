@@ -11,12 +11,13 @@ import Layout from '../../layouts/Layout.astro';
       <h2>Physical AI</h2>
       <div class="docs-grid">
         <a href="/community/docs/physical-ai/getting-started" class="doc-card">
-          <h3>시작하기</h3>
-          <p>HuggingFace LeRobot을 활용한 Physical AI 입문</p>
+          <h3>Physical AI 개요</h3>
+          <p>Physical AI의 기본 개념과 시작 방법</p>
         </a>
-        <a href="/community/docs/physical-ai/tutorial" class="doc-card">
-          <h3>튜토리얼</h3>
-          <p>단계별 실습 가이드</p>
+        <a href="/community/docs/physical-ai/lerobot" class="doc-card special">
+          <h3>🤗 LeRobot 가이드</h3>
+          <p>HuggingFace LeRobot 완벽 가이드</p>
+          <span class="badge">추천</span>
         </a>
       </div>
     </section>
@@ -93,5 +94,22 @@ import Layout from '../../layouts/Layout.astro';
   .doc-card p {
     font-size: 0.9rem;
     color: #ccc;
+  }
+
+  .doc-card.special {
+    border: 2px solid var(--accent-color);
+    position: relative;
+  }
+
+  .badge {
+    position: absolute;
+    top: -10px;
+    right: 15px;
+    background: var(--accent-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
   }
 </style>
