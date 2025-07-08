@@ -15,14 +15,14 @@ const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' 
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/community/logo.svg" />
+    <link rel="icon" type="image/jpeg" href="/community/sudormrf.jpg" />
     <title>{title} | Sudoremove Community</title>
   </head>
   <body>
     <nav>
       <div class="nav-container">
         <a href="/community/" class="logo">
-          <img src="/community/logo.svg" alt="Sudoremove" width="40" height="40" />
+          <img src="/community/sudormrf.jpg" alt="Sudoremove" width="40" height="40" style="border-radius: 50%;" />
           <span>Sudoremove</span>
         </a>
         <ul class="nav-links">
@@ -64,14 +64,16 @@ const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' 
 
   html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background: var(--background-color);
-    color: var(--text-color);
+    background: #0d030f;
+    color: #ffffff;
   }
 
   body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: #0d030f;
+    color: #ffffff;
   }
 
   nav {
@@ -92,6 +94,7 @@ const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' 
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 100%;
   }
 
   .logo {
@@ -160,6 +163,7 @@ const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' 
     margin: 0 auto;
     padding: 2rem;
     width: 100%;
+    background: #0d030f;
   }
 
   footer {

@@ -66,6 +66,8 @@ html {
 
 body {
   min-height: 100vh;
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
 }
 
 /* 링크 스타일 */

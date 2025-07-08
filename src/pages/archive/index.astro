@@ -93,9 +93,27 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style>
+  /* CSS 변수 정의 */
+  :root {
+    --primary-color: #1a0f1f;
+    --secondary-color: #251730;
+    --accent-color: #fd7318;
+    --text-color: #ffffff;
+    --text-muted: #b8b8b8;
+    --color-green: #43d6a8;
+    --color-blue: #5fadfe;
+  }
+  
+  /* 배경색 강제 적용 */
+  body {
+    background: #0d030f !important;
+    color: #ffffff !important;
+  }
+  
   .archive-container {
     max-width: 1200px;
     margin: 0 auto;
+    color: var(--text-color);
   }
 
   h1 {
@@ -105,7 +123,7 @@ import Layout from '../../layouts/Layout.astro';
 
   .subtitle {
     font-size: 1.2rem;
-    color: #999;
+    color: var(--text-muted);
     margin-bottom: 3rem;
   }
 
@@ -226,7 +244,7 @@ import Layout from '../../layouts/Layout.astro';
     gap: 1rem;
     margin-top: 1rem;
     font-size: 0.85rem;
-    color: #999;
+    color: var(--text-muted);
   }
 
   /* 갤러리 */
