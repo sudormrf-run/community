@@ -7,6 +7,11 @@ import Layout from '../../layouts/Layout.astro';
     <h1>문서</h1>
     <p class="subtitle">Sudoremove의 AI 교육 자료와 튜토리얼</p>
     
+    <div class="notice">
+      <p>📚 새로운 문서 사이트가 준비되었습니다!</p>
+      <a href="/community/docs/" class="btn btn-primary">새 문서 사이트로 이동</a>
+    </div>
+    
     <section class="docs-section">
       <h2>Physical AI</h2>
       <div class="docs-grid">
@@ -111,5 +116,19 @@ import Layout from '../../layouts/Layout.astro';
     border-radius: 1rem;
     font-size: 0.8rem;
     font-weight: 600;
+  }
+
+  .notice {
+    background: var(--secondary-color);
+    border: 2px solid var(--accent-color);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .notice p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
   }
 </style>

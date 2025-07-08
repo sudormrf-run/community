@@ -1,0 +1,59 @@
+---
+title: 'Physical AI 개요'
+description: 'Physical AI의 기본 개념과 시작 방법'
+---
+
+# Physical AI 시작하기
+
+Physical AI는 로봇공학과 인공지능을 결합하여 실제 물리적 환경에서 작동하는 지능형 시스템을 구축하는 분야입니다.
+
+## 🚀 LeRobot으로 시작하기
+
+LeRobot은 HuggingFace에서 개발한 강력한 로봇 학습 프레임워크입니다. 
+
+**📖 [LeRobot 완벽 가이드 바로가기](/community/docs/physical-ai/lerobot)**
+
+LeRobot 가이드에서는 다음을 학습할 수 있습니다:
+- 설치 및 환경 설정
+- 다양한 로봇 하드웨어 활용법
+- Imitation Learning과 Reinforcement Learning
+- 실전 프로젝트 예제
+
+### 주요 특징
+- 🤖 다양한 로봇 플랫폼 지원
+- 📚 사전 훈련된 모델 제공
+- 🛠️ 쉬운 커스터마이징
+
+## 설치 방법
+
+```bash
+# LeRobot 설치
+pip install lerobot
+
+# 의존성 패키지
+pip install torch torchvision
+```
+
+## 첫 번째 프로젝트
+
+간단한 로봇 제어 예제를 통해 Physical AI의 기초를 배워봅시다.
+
+```python
+import lerobot
+
+# 로봇 초기화
+robot = lerobot.Robot()
+
+# 기본 동작 수행
+robot.move_forward(distance=1.0)
+robot.turn_left(angle=90)
+```
+
+## 다음 단계
+
+- [튜토리얼](/community/docs/physical-ai/tutorial) - 단계별 실습 가이드
+- [고급 주제](/community/docs/physical-ai/advanced) - 심화 학습 내용
+
+---
+
+*이 문서는 지속적으로 업데이트됩니다.*

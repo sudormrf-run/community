@@ -1,0 +1,212 @@
+---
+title: 'LeRobot 시작하기'
+description: 'LeRobot 설치부터 첫 번째 예제까지'
+---
+
+# LeRobot 시작하기
+
+이 가이드는 LeRobot을 설치하고 첫 번째 로봇 제어 프로그램을 실행하는 방법을 안내합니다.
+
+## 시스템 요구사항
+
+### 필수 요구사항
+- **Python**: 3.8 이상 (3.10 권장)
+- **운영체제**: Linux, macOS, Windows (WSL2)
+- **메모리**: 최소 8GB RAM
+- **저장공간**: 10GB 이상의 여유 공간
+
+### 선택 요구사항
+- **GPU**: CUDA 지원 NVIDIA GPU (학습 속도 향상)
+- **로봇 하드웨어**: SO-100/101, Koch v1.1 등
+
+## 설치 방법
+
+### 1. 가상환경 생성 (권장)
+
+```bash
+# 가상환경 생성
+python -m venv lerobot-env
+
+# 가상환경 활성화
+# Linux/macOS
+source lerobot-env/bin/activate
+
+# Windows
+lerobot-env\Scripts\activate
+```
+
+### 2. LeRobot 설치
+
+```bash
+# PyTorch 설치 (CPU 버전)
+pip install torch torchvision
+
+# GPU 버전 (CUDA 11.8)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+# LeRobot 설치
+pip install lerobot
+```
+
+### 3. 설치 확인
+
+```python
+import lerobot
+print(f"LeRobot 버전: {lerobot.__version__}")
+```
+
+## 첫 번째 예제: 시뮬레이션
+
+실제 로봇 없이도 시뮬레이션으로 시작할 수 있습니다.
+
+### 1. 시뮬레이션 환경 실행
+
+```python
+from lerobot import Environment, Policy
+
+# 시뮬레이션 환경 생성
+env = Environment("aloha_sim_transfer_cube")
+
+# 환경 초기화
+observation = env.reset()
+print(f"관측 공간: {observation.shape}")
+```
+
+### 2. 사전 학습된 모델 로드
+
+```python
+# HuggingFace Hub에서 모델 다운로드
+policy = Policy.from_pretrained("lerobot/aloha_sim_transfer_cube")
+
+# 모델 정보 확인
+print(f"모델 타입: {policy.config.policy_type}")
+print(f"입력 차원: {policy.config.input_dim}")
+```
+
+### 3. 정책 실행
+
+```python
+# 에피소드 실행
+done = False
+total_reward = 0
+
+while not done:
+    # 정책으로부터 행동 예측
+    action = policy.predict(observation)
+    
+    # 환경에 행동 적용
+    observation, reward, done, info = env.step(action)
+    total_reward += reward
+    
+    # 시각화 (선택사항)
+    env.render()
+
+print(f"총 보상: {total_reward}")
+```
+
+## 실제 로봇 연결 (SO-100 예제)
+
+### 1. 로봇 초기화
+
+```python
+from lerobot.robots import SO100Robot
+
+# 로봇 연결
+robot = SO100Robot(
+    port="/dev/ttyUSB0",  # Linux
+    # port="/dev/tty.usbserial-*",  # macOS
+    # port="COM3",  # Windows
+)
+
+# 연결 확인
+if robot.is_connected():
+    print("로봇 연결 성공!")
+    print(f"관절 수: {robot.num_joints}")
+```
+
+### 2. 기본 제어
+
+```python
+# 홈 포지션으로 이동
+robot.move_to_home()
+
+# 특정 관절 제어
+robot.set_joint_position(joint_id=1, position=45.0)  # 45도
+
+# 모든 관절 상태 읽기
+positions = robot.get_joint_positions()
+print(f"현재 관절 위치: {positions}")
+```
+
+### 3. 원격 조작 (Teleoperation)
+
+```bash
+# 터미널에서 실행
+python -m lerobot.teleoperate \
+    --robot.type=so100 \
+    --robot.port=/dev/ttyUSB0
+```
+
+## 데이터 수집 및 저장
+
+### 1. 데이터 기록 시작
+
+```bash
+python -m lerobot.record \
+    --robot.type=so100 \
+    --dataset.repo_id=my_username/my_first_dataset \
+    --dataset.num_episodes=10
+```
+
+### 2. HuggingFace Hub에 업로드
+
+```python
+from lerobot.dataset import LeRobotDataset
+
+# 데이터셋 로드
+dataset = LeRobotDataset("my_first_dataset")
+
+# Hub에 푸시
+dataset.push_to_hub("my_username/my_first_dataset")
+```
+
+## 문제 해결
+
+### 일반적인 오류들
+
+#### 1. 모듈을 찾을 수 없음
+```bash
+# lerobot 재설치
+pip install --upgrade lerobot
+```
+
+#### 2. 로봇 연결 실패
+- USB 권한 확인: `sudo chmod 666 /dev/ttyUSB0`
+- 포트 확인: `ls /dev/tty*`
+
+#### 3. GPU 메모리 부족
+```python
+# 배치 크기 줄이기
+policy = Policy.from_pretrained(
+    "lerobot/model_name",
+    batch_size=16  # 기본값: 32
+)
+```
+
+## 다음 단계
+
+축하합니다! LeRobot의 기본 사용법을 익히셨습니다. 이제 다음을 학습해보세요:
+
+- [하드웨어 가이드](/physical-ai/lerobot/hardware) - 로봇 하드웨어 상세 설정
+- [핵심 개념](/physical-ai/lerobot/concepts) - Imitation Learning과 RL 이해
+- [튜토리얼](/physical-ai/lerobot/tutorials) - 실전 프로젝트
+
+## 유용한 리소스
+
+- [LeRobot GitHub](https://github.com/huggingface/lerobot)
+- [HuggingFace 모델 허브](https://huggingface.co/lerobot)
+- [Discord 커뮤니티](https://discord.gg/huggingface)
+
+---
+
+*문제가 발생하면 [GitHub Issues](https://github.com/huggingface/lerobot/issues)에 문의하세요.*

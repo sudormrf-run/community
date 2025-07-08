@@ -1,0 +1,81 @@
+/* Sudoremove 커스텀 스타일 */
+:root {
+  --sl-color-accent: #e94560;
+  --sl-color-accent-high: #d63850;
+  --sl-color-bg: #0f0f0f;
+  --sl-color-bg-nav: #1a1a2e;
+  --sl-color-bg-sidebar: #16213e;
+  --sl-color-text: #f5f5f5;
+  --sl-color-text-accent: #e94560;
+}
+
+/* 다크 모드 강제 적용 */
+:root {
+  color-scheme: dark;
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+  background: var(--sl-color-bg-sidebar);
+}
+
+/* 네비게이션 바 */
+header.header {
+  background: var(--sl-color-bg-nav);
+}
+
+/* 코드 블록 스타일 */
+pre {
+  background: #1e1e2e !important;
+  border: 1px solid #313244;
+}
+
+/* 링크 호버 효과 */
+a:hover {
+  color: var(--sl-color-accent-high);
+}
+
+/* 헤더 스타일 */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--sl-color-text);
+}
+
+h2 {
+  border-bottom: 2px solid var(--sl-color-accent);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* 인용구 스타일 */
+blockquote {
+  border-left: 4px solid var(--sl-color-accent);
+  background: rgba(233, 69, 96, 0.1);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+/* 테이블 스타일 */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table th {
+  background: var(--sl-color-bg-nav);
+  color: var(--sl-color-accent);
+}
+
+table td, table th {
+  border: 1px solid #313244;
+  padding: 0.75rem;
+}
+
+/* 배지 스타일 */
+.badge {
+  background: var(--sl-color-accent);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
