@@ -1,0 +1,99 @@
+---
+export interface Props {
+  type?: 'info' | 'warning' | 'success' | 'danger' | 'tip';
+  title?: string;
+}
+
+const { type = 'info', title } = Astro.props;
+
+const icons = {
+  info: 'fa-info-circle',
+  warning: 'fa-exclamation-triangle',
+  success: 'fa-check-circle',
+  danger: 'fa-times-circle',
+  tip: 'fa-lightbulb'
+};
+
+const colors = {
+  info: 'var(--color-info)',
+  warning: 'var(--color-warning)',
+  success: 'var(--color-success)',
+  danger: 'var(--color-red)',
+  tip: 'var(--color-accent)'
+};
+---
+
+<div class={`callout callout-${type}`}>
+  <div class="callout-icon">
+    <i class={`fas ${icons[type]}`}></i>
+  </div>
+  <div class="callout-content">
+    {title && <div class="callout-title">{title}</div>}
+    <slot />
+  </div>
+</div>
+
+<style define:vars={{ calloutColor: colors[type] }}>
+  .callout {
+    display: flex;
+    gap: var(--spacing-4);
+    padding: var(--spacing-4) var(--spacing-5);
+    margin: var(--spacing-6) 0;
+    background-color: rgba(var(--calloutColor), 0.05);
+    border: 1px solid var(--calloutColor);
+    border-radius: var(--radius-lg);
+    border-left-width: 4px;
+  }
+
+  .callout-icon {
+    flex-shrink: 0;
+    color: var(--calloutColor);
+    font-size: var(--text-xl);
+    opacity: 0.8;
+  }
+
+  .callout-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .callout-title {
+    font-weight: var(--font-semibold);
+    margin-bottom: var(--spacing-2);
+    color: var(--color-text);
+  }
+
+  .callout-content > :first-child:not(.callout-title) {
+    margin-top: 0;
+  }
+
+  .callout-content > :last-child {
+    margin-bottom: 0;
+  }
+
+  .callout-content p {
+    margin-bottom: var(--spacing-3);
+    color: var(--color-text-secondary);
+  }
+
+  /* 타입별 스타일 */
+  .callout-info {
+    --calloutColor: #5fadfe;
+  }
+
+  .callout-warning {
+    --calloutColor: #fde471;
+  }
+
+  .callout-success {
+    --calloutColor: #43d6a8;
+  }
+
+  .callout-danger {
+    --calloutColor: #c21829;
+  }
+
+  .callout-tip {
+    --calloutColor: #fd7318;
+  }
+</style>

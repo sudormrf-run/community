@@ -1,59 +1,111 @@
-# Astro Starter Kit: Minimal
+# Sudoremove Community
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Sudoremove 브랜드의 공식 커뮤니티 사이트입니다. AI 교육과 커뮤니티 활동을 중심으로 한 통합 플랫폼을 제공합니다.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+## 🚀 프로젝트 개요
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- **브랜드**: Sudoremove
+- **슬로건**: "AI의 문턱을 낮추다"
+- **URL**: https://sudoremove.github.io/community
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
+## 📁 프로젝트 구조
 
 ```text
 /
-├── public/
+├── public/             # 정적 자산
+│   ├── favicon.svg
+│   └── images/        # 이미지 파일
 ├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+│   ├── components/    # Astro 컴포넌트
+│   │   └── Giscus.astro
+│   ├── content/       # MDX 콘텐츠
+│   │   ├── config.ts
+│   │   └── docs/      # 문서 콘텐츠
+│   ├── layouts/       # 레이아웃 컴포넌트
+│   │   ├── Layout.astro
+│   │   └── DocsLayout.astro
+│   ├── pages/         # 페이지 라우트
+│   │   ├── index.astro      # 홈
+│   │   ├── docs/            # 문서
+│   │   ├── board/           # 게시판
+│   │   └── archive/         # 행사
+│   └── styles/        # 스타일 파일
+└── astro.config.mjs   # Astro 설정
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🎨 주요 기능
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### 구현 완료 ✅
+- 다크 테마 기반 UI/UX
+- 반응형 디자인
+- MDX 기반 문서 시스템
+- Giscus 게시판 (GitHub Issues 연동)
+- 행사 갤러리 페이지
+- GitHub Pages 배포
 
-Any static assets, like images, can be placed in the `public/` directory.
+### 개발 예정 📋
+- Physical AI 튜토리얼 콘텐츠
+- LLM 강의 아카이브 콘텐츠
+- GitHub Actions 자동화
+- 외부 채널 알림 (Slack, Discord, 카카오톡)
+- 뉴스레터 시스템
 
-## 🧞 Commands
+## 🛠️ 개발 환경 설정
 
-All commands are run from the root of the project, from a terminal:
+### 필수 요구사항
+- Node.js 18+ 
+- npm 또는 yarn
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+### 설치 및 실행
 
-## 👀 Want to learn more?
+```bash
+# 의존성 설치
+npm install
 
+# 개발 서버 실행 (http://localhost:4321)
+npm run dev
 
-## Color pallete 
+# 프로덕션 빌드
+npm run build
 
-#0d030f
-#5fadfe
-#43d6a8
-#c21829
-#fd7318
-#fde471
-#fefca8
+# 빌드 미리보기
+npm run preview
+```
+
+## 🎨 브랜드 색상
+
+- **Primary**: `#fd7318` (Orange)
+- **Secondary**: `#43d6a8` (Green)
+- **Background**: `#0d030f` (Dark)
+- **Accent Colors**: 
+  - `#5fadfe` (Blue)
+  - `#c21829` (Red)
+  - `#fde471` (Yellow)
+  - `#fefca8` (Light Yellow)
+
+## 📝 콘텐츠 작성 가이드
+
+### MDX 문서 추가
+1. `src/content/docs/` 디렉토리에 `.mdx` 파일 생성
+2. Frontmatter에 제목과 설명 추가
+3. MDX 문법으로 콘텐츠 작성
+
+### 행사 정보 추가
+1. `src/pages/archive/index.astro` 파일 수정
+2. 행사 데이터 배열에 새 항목 추가
+3. 행사 이미지는 `public/images/events/`에 저장
+
+## 🤝 기여하기
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 
 
