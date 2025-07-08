@@ -42,7 +42,7 @@ const navigation = [
   {
     title: 'LLM 강의',
     items: [
-      { title: '준비 중', href: '#' },
+      { title: 'LLM 파인튜닝 과정', href: 'https://jonhpark7966.github.io/FineTuning_Course/', external: true },
     ]
   }
 ];
@@ -116,9 +116,12 @@ const navigation = [
                         <a 
                           href={item.href}
                           class={currentPath === item.href ? 'active' : ''}
+                          target={item.external ? '_blank' : undefined}
+                          rel={item.external ? 'noopener noreferrer' : undefined}
                         >
-                          <i class="fas fa-file-alt"></i>
+                          <i class={item.external ? 'fas fa-external-link-alt' : 'fas fa-file-alt'}></i>
                           {item.title}
+                          {item.external && <span class="external-indicator"> ↗</span>}
                         </a>
                       )}
                     </li>
@@ -325,6 +328,11 @@ const navigation = [
     color: var(--color-orange);
     background: rgba(253, 115, 24, 0.1);
     border-left: 3px solid var(--color-orange);
+  }
+  
+  .external-indicator {
+    font-size: 0.8em;
+    opacity: 0.7;
   }
 
   .nav-group-title {
