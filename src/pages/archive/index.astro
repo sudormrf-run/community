@@ -30,15 +30,36 @@ import Layout from '../../layouts/Layout.astro';
 
     
 
+    <section class="past-events">
+      <h2>지난 행사</h2>
+      <div class="horizontal-scroll">
+        <div class="events-grid">
+          <a href="/events" class="event-card-link">
+            <div class="event-card past">
+              <img src="/images/events/lerobot-hackathon.jpg" alt="HuggingFace LeRobot Hackathon" />
+              <div class="event-info">
+                <h3>HuggingFace LeRobot Hackathon</h3>
+                <p class="event-date-text">2024년 6월 22일</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <section class="event-gallery">
       <h2>행사 갤러리</h2>
-      <div class="video-container">
-        <iframe 
-          src="https://www.youtube.com/embed/HgN0qIFSd8I"
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
+      <div class="horizontal-scroll">
+        <div class="gallery-grid">
+          <div class="gallery-item video-item">
+            <iframe 
+              src="https://www.youtube.com/embed/HgN0qIFSd8I"
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
       </div>
     </section>
   </div>
@@ -183,6 +204,32 @@ import Layout from '../../layouts/Layout.astro';
 
   .event-card.past .event-info {
     padding: 1.5rem;
+  }
+
+  .horizontal-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 1rem;
+  }
+
+  .horizontal-scroll .events-grid,
+  .horizontal-scroll .gallery-grid {
+    display: inline-flex;
+    gap: 1rem;
+  }
+
+  .event-card.past {
+    width: 300px;
+  }
+
+  .gallery-item {
+    width: 350px;
+    height: 200px;
+  }
+
+  .video-item iframe {
+    width: 100%;
+    height: 100%;
   }
 
   .event-date-text {
