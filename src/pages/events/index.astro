@@ -2,22 +2,24 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 
-const events = [
+const pastEvents = [
   {
     title: "HuggingFace LeRobot Hackathon",
     date: "2024년 6월 22일",
     description: "HuggingFace와 함께한 LeRobot 해커톤. 로봇을 직접 만들고 프로그래밍하며 AI의 물리적 구현을 경험했습니다.",
     image: "/images/events/lerobot-hackathon.jpg",
     link: "https://sudormrf.run/2025/06/24/huggingface-lerobot-hackathon-review/",
-    status: "past"
-  },
+    youtubeId: "HgN0qIFSd8I"
+  }
+];
+
+const upcomingEvents = [
   {
     title: "Coming Soon",
     date: "TBA",
     description: "다음 행사를 기대해주세요!",
     image: "/images/events/coming-soon.jpg",
-    link: "#",
-    status: "upcoming"
+    link: "#"
   }
 ];
 ---
@@ -27,10 +29,37 @@ const events = [
     <h1>이벤트</h1>
     <p class="subtitle">Sudoremove의 최신 소식과 이벤트</p>
 
+    <h2>지난 행사</h2>
     <div class="events-grid">
-      {events.map(event => (
-        <a href={event.link} class="event-card-link" target="_blank" rel="noopener noreferrer">
-          <div class={`event-card ${event.status}`}>
+      {pastEvents.map(event => (
+        <div class="event-card-wrapper">
+          <a href={event.link} class="event-card-link" target="_blank" rel="noopener noreferrer">
+            <div class="event-card past">
+              <img src={event.image} alt={event.title} />
+              <div class="event-info">
+                <h3>{event.title}</h3>
+                <p class="event-date-text">{event.date}</p>
+                <p>{event.description}</p>
+              </div>
+            </div>
+          </a>
+          <div class="video-container">
+            <iframe 
+              src={`https://www.youtube.com/embed/${event.youtubeId}`}
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <h2>예정된 행사</h2>
+    <div class="events-grid">
+      {upcomingEvents.map(event => (
+        <a href={event.link} class="event-card-link">
+          <div class="event-card upcoming">
             <img src={event.image} alt={event.title} />
             <div class="event-info">
               <h3>{event.title}</h3>
@@ -52,10 +81,18 @@ const events = [
     color: #ffffff;
   }
 
+  h1, h2 {
+    color: #fd7318;
+  }
+
   h1 {
     font-size: 2.5rem;
     margin-bottom: 0.5rem;
-    color: #fd7318;
+  }
+  
+  h2 {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
   }
 
   .subtitle {
@@ -116,5 +153,24 @@ const events = [
 
   .event-card.upcoming .event-info h3 {
     color: #5fadfe;
+  }
+  
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background: #000;
+    margin-top: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
 </style>
