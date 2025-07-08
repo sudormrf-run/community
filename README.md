@@ -44,4 +44,16 @@ All commands are run from the root of the project, from a terminal:
 
 ## 👀 Want to learn more?
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+
+## Color pallete 
+
+#0d030f
+#5fadfe
+#43d6a8
+#c21829
+#fd7318
+#fde471
+#fefca8
+
+
+
