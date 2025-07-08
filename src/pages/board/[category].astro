@@ -1,0 +1,234 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Giscus from '../../components/Giscus.astro';
+import { boardCategories } from '../../data/board-categories';
+import '../../styles/global.css';
+
+export function getStaticPaths() {
+  return boardCategories.map((category) => ({
+    params: { category: category.slug },
+    props: { category }
+  }));
+}
+
+const { category } = Astro.props;
+---
+
+<Layout title={`${category.name} - 게시판`}>
+  <div class="category-container">
+    <div class="breadcrumb">
+      <a href="/board">← 게시판 목록</a>
+    </div>
+
+    <div class="category-header">
+      <div class="header-content">
+        <span class="category-emoji">{category.emoji}</span>
+        <div>
+          <h1>{category.name}</h1>
+          <p class="category-description">{category.description}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="discussion-info">
+      <h2>토론 참여 안내</h2>
+      <ul>
+        <li>GitHub 계정으로 로그인하면 토론에 참여할 수 있습니다</li>
+        <li>마크다운 문법을 사용하여 풍부한 내용을 작성할 수 있습니다</li>
+        <li>코드 블록, 이미지, 링크 등을 자유롭게 활용하세요</li>
+      </ul>
+    </div>
+
+    <div class="discussion-section">
+      <Giscus />
+    </div>
+
+    <div class="other-categories">
+      <h3>다른 카테고리 둘러보기</h3>
+      <div class="other-categories-grid">
+        {boardCategories
+          .filter(cat => cat.id !== category.id)
+          .map((cat) => (
+            <a href={`/board/${cat.slug}`} class="other-category-card">
+              <span class="emoji">{cat.emoji}</span>
+              <span class="name">{cat.name}</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  :root {
+    --primary-color: #1a0f1f;
+    --secondary-color: #251730;
+    --accent-color: #fd7318;
+    --accent-green: #43d6a8;
+    --text-color: #ffffff;
+    --text-muted: #b8b8b8;
+    --border-color: #333;
+  }
+
+  body {
+    background: #0d030f !important;
+    color: #ffffff !important;
+  }
+
+  .category-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .breadcrumb {
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumb a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--accent-green);
+  }
+
+  .category-header {
+    background: var(--secondary-color);
+    border-radius: 1rem;
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .category-emoji {
+    font-size: 4rem;
+  }
+
+  .category-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+  }
+
+  .category-description {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .discussion-info {
+    background: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .discussion-info h2 {
+    color: var(--accent-green);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+
+  .discussion-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .discussion-info li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--text-muted);
+  }
+
+  .discussion-info li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+  }
+
+  .discussion-section {
+    margin-bottom: 4rem;
+  }
+
+  .other-categories {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .other-categories h3 {
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+  }
+
+  .other-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .other-category-card {
+    background: var(--primary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+  }
+
+  .other-category-card:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    background: var(--secondary-color);
+  }
+
+  .other-category-card .emoji {
+    font-size: 1.5rem;
+  }
+
+  .other-category-card .name {
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .category-header {
+      padding: 1.5rem;
+    }
+
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .category-emoji {
+      font-size: 3rem;
+    }
+
+    .category-header h1 {
+      font-size: 2rem;
+    }
+
+    .other-categories-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
