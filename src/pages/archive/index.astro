@@ -185,25 +185,53 @@ import Layout from '../../layouts/Layout.astro';
   }
 
   .event-card.past {
-    background: var(--secondary-color);
+    position: relative;
     border-radius: 0.5rem;
     overflow: hidden;
     transition: transform 0.3s;
+    background-image: url('/images/events/lerobot-hackathon.jpeg');
+    background-size: cover;
+    background-position: center;
+    height: 200px; /* Fixed height for the card */
+    display: flex;
+    align-items: flex-end; /* Align content to the bottom */
+  }
+
+  .event-card.past::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Translucent overlay */
+    z-index: 1;
   }
 
   .event-card.past:hover {
     transform: translateY(-4px);
   }
 
-  .event-card.past img {
+  .event-card.past .event-info {
+    position: relative;
+    z-index: 2;
+    padding: 1rem;
     width: 100%;
-    height: 200px;
-    object-fit: cover;
-    background: #333;
+    background: rgba(0, 0, 0, 0.3); /* Slightly darker background for text */
   }
 
-  .event-card.past .event-info {
-    padding: 1.5rem;
+  .event-card.past .event-info h3 {
+    margin-bottom: 0.25rem;
+    color: white;
+  }
+
+  .event-card.past .event-date-text {
+    color: #43d6a8; /* Green color for date */
+    font-size: 0.8rem;
+  }
+
+  .event-card.past img { /* Hide the img tag as background-image is used */
+    display: none;
   }
 
   .horizontal-scroll {
