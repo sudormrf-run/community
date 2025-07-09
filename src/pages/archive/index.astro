@@ -197,6 +197,7 @@ import Layout from '../../layouts/Layout.astro';
     overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 1rem;
+    -webkit-overflow-scrolling: touch;
   }
 
   .horizontal-scroll .events-grid,
@@ -278,6 +279,25 @@ import Layout from '../../layouts/Layout.astro';
   }
 
   @media (max-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .events-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .event-card {
+      min-width: 250px;
+      max-width: 280px;
+    }
+    
     .event-card.upcoming {
       flex-direction: column;
       text-align: center;
@@ -285,6 +305,20 @@ import Layout from '../../layouts/Layout.astro';
 
     .event-details {
       justify-content: center;
+    }
+    
+    .gallery-item {
+      width: 250px;
+      height: 200px;
+    }
+    
+    .gallery-item h4 {
+      font-size: 0.9rem;
+    }
+    
+    .coming-soon-badge {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.7rem;
     }
   }
 </style>

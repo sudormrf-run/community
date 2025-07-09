@@ -73,8 +73,51 @@ import '../../styles/global.css';
   
   .people-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .people-container {
+      padding: 1rem;
+    }
+    
+    h1 {
+      font-size: 2rem;
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+    
+    .people-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .person-card, .join-card {
+      padding: 1.5rem;
+    }
+    
+    .person-image {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1rem;
+    }
+    
+    .person-card h3 {
+      font-size: 1.25rem;
+    }
+    
+    .links {
+      flex-wrap: wrap;
+    }
+    
+    .links a {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+    }
   }
   
   .person-card, .join-card {

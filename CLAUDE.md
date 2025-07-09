@@ -118,6 +118,10 @@ SUDO REMOVE 브랜드의 공식 커뮤니티 사이트 구축 프로젝트입니
 - [ ] 뉴스레터 템플릿 및 자동화 시스템
 - [ ] SEO 최적화 (sitemap, Open Graph)
 - [ ] Shop 페이지 오픈
+- [ ] AI 뉴스 자동 수집 및 GitHub Discussions 포스팅 시스템
+  - LLM을 활용한 뉴스/링크 요약 및 정리
+  - 주간/일간 단위로 자동 Discussion 생성
+  - RSS 피드, 트위터, 블로그 등 다양한 소스 통합
 
 ## 질문 및 확인 사항
 
