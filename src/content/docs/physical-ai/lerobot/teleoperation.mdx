@@ -1,0 +1,301 @@
+---
+title: 'Teleoperation 가이드'
+description: 'LeRobot으로 로봇을 원격 조작하는 방법'
+---
+
+import Callout from '../../../../components/Callout.astro';
+import Tabs from '../../../../components/Tabs.astro';
+
+<Callout type="info" title="Teleoperation이란?">
+  Teleoperation(원격 조작)은 컨트롤러나 다른 입력 장치를 사용하여 로봇을 원격으로 제어하는 기술입니다. LeRobot에서는 이를 통해 데이터를 수집하고 로봇의 동작을 테스트할 수 있습니다.
+</Callout>
+
+## 개요
+
+Teleoperation은 LeRobot에서 두 가지 핵심 목적을 가집니다:
+
+1. **데이터 수집**: 인간이 로봇을 조작하며 생성한 데이터로 Imitation Learning
+2. **테스트 및 디버깅**: 로봇의 동작을 직접 제어하며 하드웨어 검증
+
+## 지원되는 입력 장치
+
+### 1. 게임 컨트롤러
+
+가장 일반적이고 접근하기 쉬운 방법입니다.
+
+- **PlayStation 컨트롤러** (권장)
+- **Xbox 컨트롤러**
+- **일반 USB 게임패드**
+
+### 2. 스페이스마우스
+
+정밀한 6DoF(6자유도) 제어가 필요한 경우:
+
+- **3Dconnexion SpaceMouse**
+- 3D 모델링용 입력 장치를 로봇 제어에 활용
+
+### 3. 리더-팔로워 방식
+
+동일한 로봇 2대를 사용하는 고급 방식:
+
+- 한 로봇(리더)을 손으로 움직이면
+- 다른 로봇(팔로워)이 동작을 따라함
+- 가장 직관적이지만 비용이 높음
+
+## 기본 Teleoperation 설정
+
+### 1단계: 하드웨어 연결 확인
+
+```bash
+# 로봇 연결 상태 확인
+python -c "from lerobot import available_robots; print(available_robots())"
+```
+
+### 2단계: 컨트롤러 연결
+
+<Tabs tabs={['PlayStation', 'Xbox', 'SpaceMouse']}>
+  <div class="tab-panel">
+    ```bash
+    # PlayStation 컨트롤러 연결
+    # 1. USB로 연결하거나
+    # 2. Bluetooth로 페어링
+    
+    # 연결 확인
+    ls /dev/input/js*
+    ```
+  </div>
+  <div class="tab-panel">
+    ```bash
+    # Xbox 컨트롤러 연결
+    # USB로 연결 후 확인
+    
+    ls /dev/input/js*
+    ```
+  </div>
+  <div class="tab-panel">
+    ```bash
+    # SpaceMouse 드라이버 설치
+    pip install pyspacemouse
+    
+    # 연결 확인
+    python -c "import pyspacemouse; print(pyspacemouse.list_devices())"
+    ```
+  </div>
+</Tabs>
+
+### 3단계: Teleoperation 실행
+
+```python
+from lerobot.common.robot_devices.robots.factory import make_robot
+from lerobot.common.robot_devices.control import TeleoperationController
+
+# 로봇 초기화
+robot = make_robot(
+    robot_type="so101",  # 사용하는 로봇 타입
+    robot_kwargs={
+        "port": "/dev/ttyUSB0",  # 로봇 연결 포트
+    }
+)
+
+# 텔레오퍼레이션 컨트롤러 생성
+teleop = TeleoperationController(
+    robot=robot,
+    device_type="gamepad"  # 또는 "spacemouse"
+)
+
+# 텔레오퍼레이션 시작
+print("텔레오퍼레이션을 시작합니다. 'Ctrl+C'로 종료하세요.")
+teleop.run()
+```
+
+## 컨트롤 매핑
+
+### 게임패드 기본 매핑
+
+<div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem; margin: 1rem 0;">
+  <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">🎮 PlayStation/Xbox 컨트롤러</h4>
+  
+  - **왼쪽 조이스틱**: X/Y 축 이동
+  - **오른쪽 조이스틱**: Z 축 회전
+  - **L2/R2 트리거**: 그리퍼 열기/닫기
+  - **L1/R1 버튼**: 속도 조절
+  - **△/○/✕/□**: 사전 정의된 포즈
+  - **OPTIONS**: 긴급 정지
+</div>
+
+### 커스텀 매핑
+
+필요에 따라 컨트롤 매핑을 커스터마이즈할 수 있습니다:
+
+```python
+# 커스텀 컨트롤 매핑
+custom_mapping = {
+    "left_stick_x": "joint_1",
+    "left_stick_y": "joint_2", 
+    "right_stick_x": "joint_3",
+    "right_stick_y": "joint_4",
+    "l2": "gripper_open",
+    "r2": "gripper_close",
+}
+
+teleop = TeleoperationController(
+    robot=robot,
+    device_type="gamepad",
+    control_mapping=custom_mapping
+)
+```
+
+## 데이터 수집 모드
+
+Teleoperation을 통해 학습 데이터를 수집할 수 있습니다:
+
+```python
+from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+
+# 데이터셋 생성
+dataset = LeRobotDataset(
+    repo_id="my_robot_dataset",
+    local_dir="./data"
+)
+
+# 데이터 수집 모드로 텔레오퍼레이션
+teleop = TeleoperationController(
+    robot=robot,
+    device_type="gamepad",
+    record_data=True,
+    dataset=dataset
+)
+
+# 데이터 수집 시작
+print("데이터 수집을 시작합니다...")
+print("RECORD 버튼: 녹화 시작/중지")
+print("Ctrl+C: 세션 종료")
+
+teleop.run()
+```
+
+<Callout type="tip" title="데이터 수집 팁">
+  - 다양한 각도와 속도로 동작 수행
+  - 각 동작을 여러 번 반복
+  - 실패 케이스도 포함하여 수집
+  - 조명과 배경을 다양하게 변경
+</Callout>
+
+## 안전 설정
+
+### 속도 제한
+
+로봇 손상을 방지하기 위한 속도 제한:
+
+```python
+teleop = TeleoperationController(
+    robot=robot,
+    max_joint_speed=0.5,  # 최대 속도 50%
+    acceleration_limit=0.3  # 가속도 제한
+)
+```
+
+### 작업 공간 제한
+
+로봇의 동작 범위를 제한:
+
+```python
+workspace_limits = {
+    "x": (-0.3, 0.3),  # X축 범위: -30cm ~ 30cm
+    "y": (-0.3, 0.3),  # Y축 범위
+    "z": (0.0, 0.4),   # Z축 범위: 0 ~ 40cm
+}
+
+teleop = TeleoperationController(
+    robot=robot,
+    workspace_limits=workspace_limits
+)
+```
+
+### 긴급 정지
+
+<Callout type="warning" title="안전 주의사항">
+  항상 긴급 정지 방법을 숙지하고 있어야 합니다:
+  - **소프트웨어**: OPTIONS/START 버튼
+  - **하드웨어**: 전원 차단 스위치
+  - **프로그램**: Ctrl+C
+</Callout>
+
+## 고급 기능
+
+### 실시간 시각화
+
+```python
+# 실시간 로봇 상태 시각화
+teleop = TeleoperationController(
+    robot=robot,
+    enable_visualization=True,
+    viz_update_rate=30  # 30 FPS
+)
+```
+
+### 힘 피드백 (지원 시)
+
+```python
+# 햅틱 피드백 활성화
+teleop = TeleoperationController(
+    robot=robot,
+    enable_force_feedback=True,
+    feedback_gain=0.5
+)
+```
+
+## 문제 해결
+
+### 일반적인 문제
+
+<details>
+<summary>컨트롤러가 인식되지 않음</summary>
+
+```bash
+# 컨트롤러 연결 확인
+ls /dev/input/js*
+
+# 권한 문제 해결
+sudo chmod 666 /dev/input/js0
+
+# udev 규칙 추가 (영구적 해결)
+echo 'KERNEL=="js*", MODE="0666"' | sudo tee /etc/udev/rules.d/99-gamepad.rules
+sudo udevadm control --reload-rules
+```
+
+</details>
+
+<details>
+<summary>로봇이 부드럽게 움직이지 않음</summary>
+
+- 제어 주파수 확인 (최소 30Hz 권장)
+- 네트워크 지연 확인 (원격 연결 시)
+- 모터 드라이버 설정 확인
+
+</details>
+
+<details>
+<summary>데이터 수집이 되지 않음</summary>
+
+- 디스크 공간 확인
+- 카메라 연결 상태 확인
+- 데이터셋 권한 확인
+
+</details>
+
+## 다음 단계
+
+Teleoperation 설정이 완료되었다면:
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0;">
+  <a href="/community/docs/physical-ai/lerobot/data-collection" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
+    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-database"></i> 데이터 수집</h3>
+    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">효과적인 학습 데이터 수집 전략</p>
+  </a>
+  
+  <a href="/community/docs/physical-ai/lerobot/training" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
+    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-brain"></i> 모델 학습</h3>
+    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">수집한 데이터로 AI 모델 학습</p>
+  </a>
+</div>

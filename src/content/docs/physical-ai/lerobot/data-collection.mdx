@@ -1,0 +1,332 @@
+---
+title: '데이터 수집 가이드'
+description: 'LeRobot으로 고품질 학습 데이터를 수집하는 방법'
+---
+
+import Callout from '../../../../components/Callout.astro';
+import Tabs from '../../../../components/Tabs.astro';
+
+<Callout type="info" title="왜 데이터 수집이 중요한가?">
+  Imitation Learning의 성공은 데이터의 품질과 양에 달려 있습니다. 잘 수집된 데이터는 로봇이 복잡한 작업을 학습하는 핵심입니다.
+</Callout>
+
+## 데이터 수집 개요
+
+LeRobot에서 데이터 수집은 다음 요소로 구성됩니다:
+
+1. **로봇 상태**: 관절 각도, 속도, 토크
+2. **시각 정보**: RGB 카메라 이미지
+3. **행동 정보**: 제어 명령과 타이밍
+4. **메타데이터**: 작업 정보, 성공/실패 여부
+
+## 데이터 수집 준비
+
+### 1단계: 작업 환경 설정
+
+<Callout type="warning" title="일관된 환경 유지">
+  학습 성능을 위해 데이터 수집 환경을 일관되게 유지하는 것이 중요합니다.
+</Callout>
+
+```python
+# 작업 환경 체크리스트
+environment_checklist = {
+    "lighting": "일정한 조명 유지",
+    "camera_position": "고정된 카메라 위치",
+    "workspace": "정리된 작업 공간",
+    "objects": "일관된 물체 배치"
+}
+```
+
+### 2단계: 카메라 설정
+
+```python
+from lerobot.common.robot_devices.cameras.factory import make_camera
+
+# 카메라 초기화
+camera = make_camera(
+    camera_type="opencv",
+    camera_kwargs={
+        "camera_index": 0,  # 웹캠 인덱스
+        "fps": 30,
+        "width": 640,
+        "height": 480
+    }
+)
+
+# 카메라 캘리브레이션
+camera.calibrate()
+```
+
+### 3단계: 데이터셋 생성
+
+```python
+from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+from datetime import datetime
+
+# 데이터셋 이름 생성
+task_name = "pick_and_place"
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+dataset_name = f"{task_name}_{timestamp}"
+
+# 데이터셋 초기화
+dataset = LeRobotDataset(
+    repo_id=f"my_org/{dataset_name}",
+    local_dir=f"./data/{dataset_name}",
+    fps=30
+)
+```
+
+## 데이터 수집 실행
+
+### 기본 수집 스크립트
+
+```python
+from lerobot.scripts.collect_data import collect_data
+
+# 데이터 수집 실행
+collect_data(
+    robot=robot,
+    dataset=dataset,
+    camera=camera,
+    episodes=100,  # 수집할 에피소드 수
+    episode_length=1000,  # 각 에피소드의 최대 길이
+)
+```
+
+### 고급 수집 설정
+
+```python
+from lerobot.common.robot_devices.control import DataCollector
+
+# 데이터 수집기 설정
+collector = DataCollector(
+    robot=robot,
+    cameras=[camera],
+    dataset=dataset,
+    use_haptic_feedback=True,  # 햅틱 피드백 사용
+    record_frequency=30,  # Hz
+)
+
+# 수집 시작
+print("데이터 수집을 시작합니다...")
+print("스페이스바: 에피소드 시작/종료")
+print("S: 성공 표시")
+print("F: 실패 표시")
+print("Q: 수집 종료")
+
+collector.start_collection()
+```
+
+## 데이터 수집 전략
+
+### 1. 다양성 확보
+
+<div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem; margin: 1rem 0;">
+  <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">🎯 다양한 시나리오 포함</h4>
+  
+  - **시작 위치**: 다양한 초기 로봇 위치
+  - **물체 배치**: 랜덤한 물체 위치
+  - **속도 변화**: 느린/빠른 동작 혼합
+  - **각도 변화**: 다양한 접근 각도
+</div>
+
+### 2. 실패 데이터 포함
+
+```python
+# 에피소드 레이블링
+episode_labels = {
+    "success": True,  # 작업 성공
+    "failure_reason": None,  # 실패 이유
+    "difficulty": "medium",  # 난이도
+    "notes": "물체를 약간 비스듬히 잡음"
+}
+
+collector.label_episode(episode_labels)
+```
+
+### 3. 품질 관리
+
+<Tabs tabs={['수집 중 확인', '수집 후 검증']}>
+  <div class="tab-panel">
+    ```python
+    # 실시간 데이터 품질 모니터링
+    collector.enable_quality_checks(
+        check_image_quality=True,
+        check_action_smoothness=True,
+        check_timing_consistency=True
+    )
+    
+    # 이상 데이터 자동 필터링
+    collector.set_outlier_detection(
+        joint_velocity_threshold=2.0,  # rad/s
+        acceleration_threshold=5.0  # rad/s²
+    )
+    ```
+  </div>
+  <div class="tab-panel">
+    ```python
+    # 수집된 데이터 검증
+    from lerobot.common.datasets.utils import validate_dataset
+    
+    validation_report = validate_dataset(
+        dataset_path="./data/my_dataset",
+        check_completeness=True,
+        check_consistency=True,
+        visualize_samples=True
+    )
+    
+    print(f"유효한 에피소드: {validation_report['valid_episodes']}")
+    print(f"문제있는 에피소드: {validation_report['invalid_episodes']}")
+    ```
+  </div>
+</Tabs>
+
+## 효율적인 데이터 수집 팁
+
+### 1. 배치 수집 계획
+
+```python
+# 수집 계획 수립
+collection_plan = {
+    "easy_tasks": {
+        "episodes": 30,
+        "description": "간단한 pick and place"
+    },
+    "medium_tasks": {
+        "episodes": 50,
+        "description": "장애물 회피 포함"
+    },
+    "hard_tasks": {
+        "episodes": 20,
+        "description": "정밀한 조작 필요"
+    }
+}
+
+# 진행 상황 추적
+for task_type, config in collection_plan.items():
+    print(f"\n{task_type} 수집 중...")
+    collect_task_data(config)
+```
+
+### 2. 휴먼 인 더 루프
+
+<Callout type="tip" title="인간 개입 활용">
+  어려운 작업은 인간이 직접 시연하고, 쉬운 작업은 자동화하여 효율성을 높이세요.
+</Callout>
+
+```python
+# 하이브리드 데이터 수집
+collector = DataCollector(
+    robot=robot,
+    mode="hybrid",
+    human_intervention_threshold=0.8  # 80% 확신도 이하시 인간 개입
+)
+```
+
+### 3. 데이터 증강
+
+```python
+# 온라인 데이터 증강
+augmentation_config = {
+    "color_jitter": 0.1,
+    "brightness": 0.2,
+    "add_noise": 0.05,
+    "random_crop": True
+}
+
+collector.enable_augmentation(augmentation_config)
+```
+
+## 데이터셋 관리
+
+### 업로드 및 공유
+
+```python
+# HuggingFace Hub에 업로드
+dataset.push_to_hub(
+    repo_id="my_org/my_robot_dataset",
+    private=False,  # 공개 데이터셋
+    commit_message="Initial dataset upload"
+)
+```
+
+### 데이터셋 병합
+
+```python
+# 여러 데이터셋 병합
+from lerobot.common.datasets.utils import merge_datasets
+
+merged_dataset = merge_datasets(
+    dataset_paths=[
+        "./data/dataset1",
+        "./data/dataset2",
+        "./data/dataset3"
+    ],
+    output_path="./data/merged_dataset"
+)
+```
+
+### 데이터 시각화
+
+```python
+# 수집된 데이터 시각화
+from lerobot.common.datasets.visualization import visualize_episodes
+
+visualize_episodes(
+    dataset=dataset,
+    episode_indices=[0, 10, 20],  # 시각화할 에피소드
+    save_path="./visualizations",
+    create_video=True
+)
+```
+
+## 문제 해결
+
+### 일반적인 문제들
+
+<details>
+<summary>카메라 프레임 드롭</summary>
+
+- 카메라 해상도 낮추기
+- USB 3.0 포트 사용
+- 다른 USB 장치 분리
+
+</details>
+
+<details>
+<summary>로봇 동작 지연</summary>
+
+- 제어 주파수 확인
+- 네트워크 대역폭 확인 (원격 제어 시)
+- CPU 사용률 모니터링
+
+</details>
+
+<details>
+<summary>데이터 불일치</summary>
+
+- 타임스탬프 동기화 확인
+- 모든 센서의 샘플링 레이트 일치
+- NTP 시간 동기화 사용
+
+</details>
+
+## 다음 단계
+
+고품질 데이터를 수집했다면 이제 모델을 학습시킬 차례입니다:
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0;">
+  <a href="/community/docs/physical-ai/lerobot/training" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
+    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-brain"></i> 모델 학습</h3>
+    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">수집한 데이터로 AI 모델 학습하기</p>
+  </a>
+  
+  <a href="/community/docs/physical-ai/lerobot/tutorials" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
+    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-book"></i> 실전 튜토리얼</h3>
+    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">실제 프로젝트로 배우기</p>
+  </a>
+</div>
+
+<Callout type="success" title="축하합니다!">
+  이제 고품질의 로봇 학습 데이터를 수집하는 방법을 마스터했습니다. 수집한 데이터로 강력한 AI 모델을 만들어보세요!
+</Callout>
