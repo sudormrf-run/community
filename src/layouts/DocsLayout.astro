@@ -16,8 +16,15 @@ const navigation = [
     items: [
       { title: '소개', href: '/community/docs/physical-ai/lerobot/intro' },
       { title: '시작하기', href: '/community/docs/physical-ai/lerobot/getting-started' },
-      { title: '설치', href: '/community/docs/physical-ai/lerobot/installation' },
-      { title: '원격 조작', href: '/community/docs/physical-ai/lerobot/teleoperation' },
+      {
+        title: '소프트웨어',
+        items: [
+          { title: '설치', href: '/community/docs/physical-ai/lerobot/software/installation' },
+          { title: 'Teleoperation', href: '/community/docs/physical-ai/lerobot/software/teleoperation' },
+          { title: '데이터 수집', href: '/community/docs/physical-ai/lerobot/software/data-collection' },
+          { title: '학습', href: '/community/docs/physical-ai/lerobot/software/training' },
+        ]
+      },
       {
         title: '하드웨어',
         items: [
