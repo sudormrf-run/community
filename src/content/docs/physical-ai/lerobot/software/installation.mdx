@@ -13,85 +13,67 @@ import Tabs from '../../../../../components/Tabs.astro';
 ## 시스템 요구사항
 
 ### 필수 요구사항
-- **Python 3.10** (3.11 이상은 아직 지원 안 됨)
+- **Python 3.10**, 환경과 함께 설치하면 됨.
 - **Git**
-- **8GB RAM** 이상 권장
-- **CUDA 지원 GPU** (선택사항, 학습 시 권장)
 
-### 운영체제별 추가 요구사항
+### 권장 요구사항
+- **CUDA 지원 GPU** (학습 시에 없으면 너무 느림...)
+- **USB 가 많은 컴퓨터** (카메라, 로봇 모두 USB 인데 허브 통하면 프레임 밀리는 문제 많음)
 
-<Tabs tabs={['macOS', 'Ubuntu/Linux', 'Windows']}>
-  <div class="tab-panel">
-    ```bash
-    # Homebrew가 없다면 먼저 설치
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    
-    # 필수 패키지 설치
-    brew install ffmpeg cmake
-    ```
+<Callout type="tip" title="필자의 추천 시스템 구성">
+  <div style="display: flex; flex-direction: column; gap: 1rem;">
+    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+      <span style="color: var(--color-green); font-weight: bold;">입문자</span>
+      <div>
+        <strong>Macbook 또는 리눅스 노트북</strong>으로 시작하셔도 됩니다.<br/>
+        학습은 클라우드 GPU를 빌려서 하시면 됩니다.
+      </div>
+    </div>
+    <div style="display: flex; align-items: flex-start; gap: 0.5rem;">
+      <span style="color: var(--color-orange); font-weight: bold;">본격파</span>
+      <div>
+        안정적으로 시도하시려면 다음 사양의 <strong>데스크탑</strong>을 추천합니다:
+        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+          <li>NVIDIA GPU 30시리즈 이상 (3060 Ti, 3070, 3080 등)</li>
+          <li>USB 포트 4개 이상 (허브 사용 시 프레임 드롭 주의)</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="tab-panel">
-    ```bash
-    # 시스템 패키지 업데이트
-    sudo apt-get update
-    
-    # 필수 개발 도구 설치
-    sudo apt-get install -y \
-        cmake \
-        build-essential \
-        python3-dev \
-        pkg-config \
-        libavformat-dev \
-        libavcodec-dev \
-        libavdevice-dev \
-        libavutil-dev \
-        libswscale-dev \
-        libswresample-dev \
-        libavfilter-dev
-    ```
-  </div>
-  <div class="tab-panel">
-    <Callout type="info">
-      Windows에서는 WSL2 (Windows Subsystem for Linux) 사용을 권장합니다.
-      네이티브 Windows 환경에서는 일부 기능이 제한될 수 있습니다.
-    </Callout>
-  </div>
-</Tabs>
+</Callout>
+
+
+
 
 ## 설치 과정
 
-### 1단계: Miniconda 설치 (권장)
+### 1단계: uv 설치 (권장)
 
-Conda 환경을 사용하면 패키지 충돌을 방지하고 깔끔한 개발 환경을 유지할 수 있습니다.
+uv는 Rust로 작성된 초고속 Python 패키지 관리자로, pip보다 10-100배 빠르고 가상환경을 자동으로 관리해줍니다.
 
-<Tabs tabs={['macOS', 'Linux', 'Windows']}>
+<Tabs tabs={['macOS/Linux', 'Windows']}>
   <div class="tab-panel">
     ```bash
-    # Miniconda 다운로드 및 설치
-    curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
-    bash Miniconda3-latest-MacOSX-x86_64.sh
+    # uv 설치
+    curl -LsSf https://astral.sh/uv/install.sh | sh
     
-    # 터미널 재시작 후 확인
-    conda --version
-    ```
-  </div>
-  <div class="tab-panel">
-    ```bash
-    # Miniconda 다운로드 및 설치
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    bash Miniconda3-latest-Linux-x86_64.sh
+    # 또는 Homebrew 사용 (macOS)
+    brew install uv
     
-    # 터미널 재시작 후 확인
-    conda --version
+    # 설치 확인
+    uv --version
     ```
   </div>
   <div class="tab-panel">
     ```powershell
-    # Miniconda 설치 프로그램 다운로드 후 실행
-    # https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
+    # PowerShell에서 실행
+    irm https://astral.sh/uv/install.ps1 | iex
     
-    # 설치 후 Anaconda Prompt에서 확인
-    conda --version
+    # 또는 winget 사용
+    winget install --id=astral.uv
+    
+    # 설치 확인
+    uv --version
     ```
   </div>
 </Tabs>
@@ -104,34 +86,58 @@ git clone https://github.com/huggingface/lerobot.git
 cd lerobot
 ```
 
-### 3단계: Conda 환경 생성 및 활성화
+### 3단계: Python 환경 설정
 
 ```bash
-# Python 3.10 환경 생성
-conda create -y -n lerobot python=3.10
+# Python 3.10 설치 및 가상환경 생성 (uv가 자동으로 처리)
+uv venv --python 3.10
 
-# 환경 활성화
-conda activate lerobot
+# 가상환경 활성화
+# macOS/Linux:
+source .venv/bin/activate
+
+# Windows:
+.venv\Scripts\activate
 ```
 
 <Callout type="tip">
-  매번 LeRobot을 사용할 때는 `conda activate lerobot` 명령으로 환경을 활성화해야 합니다.
+  uv는 프로젝트별로 독립된 가상환경을 자동으로 관리합니다. 프로젝트 디렉토리에서 `uv pip` 명령을 사용하면 자동으로 올바른 환경을 사용합니다.
 </Callout>
 
 ### 4단계: ffmpeg 설치
 
 영상 처리를 위해 ffmpeg가 필요합니다.
 
-```bash
-# Conda를 통한 ffmpeg 설치 (권장)
-conda install ffmpeg -c conda-forge
-```
+<Tabs tabs={['macOS', 'Ubuntu/Linux', 'Windows']}>
+  <div class="tab-panel">
+    ```bash
+    # Homebrew로 설치
+    brew install ffmpeg
+    ```
+  </div>
+  <div class="tab-panel">
+    ```bash
+    # apt로 설치
+    sudo apt update
+    sudo apt install ffmpeg
+    ```
+  </div>
+  <div class="tab-panel">
+    ```powershell
+    # winget으로 설치
+    winget install ffmpeg
+    
+    # 또는 Chocolatey 사용
+    choco install ffmpeg
+    ```
+  </div>
+</Tabs>
 
 ### 5단계: LeRobot 설치
 
 ```bash
-# 기본 설치 (개발 모드)
-pip install -e .
+# uv를 사용한 설치 (매우 빠름!)
+uv pip install -e .
 ```
 
 ## 선택적 설치 옵션
@@ -142,13 +148,13 @@ pip install -e .
 
 ```bash
 # ALOHA 시뮬레이션 환경
-pip install -e ".[aloha]"
+uv pip install -e ".[aloha]"
 
 # Push-T 시뮬레이션 환경
-pip install -e ".[pusht]"
+uv pip install -e ".[pusht]"
 
 # 모든 시뮬레이션 환경
-pip install -e ".[aloha,pusht,xarm]"
+uv pip install -e ".[aloha,pusht,xarm]"
 ```
 
 ### 로봇 하드웨어 드라이버
@@ -157,10 +163,10 @@ pip install -e ".[aloha,pusht,xarm]"
 
 ```bash
 # Feetech 모터 (SO-100, SO-101)
-pip install -e ".[feetech]"
+uv pip install -e ".[feetech]"
 
 # Dynamixel 모터
-pip install -e ".[dynamixel]"
+uv pip install -e ".[dynamixel]"
 ```
 
 ### 실험 추적 도구
@@ -169,7 +175,7 @@ pip install -e ".[dynamixel]"
 
 ```bash
 # W&B 설치
-pip install wandb
+uv pip install wandb
 
 # W&B 로그인
 wandb login
@@ -212,8 +218,8 @@ python lerobot/scripts/eval.py \
 <summary>ImportError: No module named 'lerobot'</summary>
 
 LeRobot이 제대로 설치되지 않았습니다. 다음을 확인하세요:
-- `conda activate lerobot` 명령으로 환경을 활성화했는지 확인
-- `pip install -e .` 명령을 lerobot 폴더 내에서 실행했는지 확인
+- 가상환경이 활성화되었는지 확인 (`source .venv/bin/activate`)
+- `uv pip install -e .` 명령을 lerobot 폴더 내에서 실행했는지 확인
 
 </details>
 
@@ -226,7 +232,7 @@ GPU를 사용하려면 CUDA와 PyTorch가 올바르게 설치되어야 합니다
 nvidia-smi
 
 # PyTorch 재설치 (CUDA 11.8 예시)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
 
 </details>
@@ -239,8 +245,10 @@ ffmpeg가 올바르게 설치되지 않았을 수 있습니다:
 # ffmpeg 버전 확인
 ffmpeg -version
 
-# conda로 재설치
-conda install -c conda-forge ffmpeg=7
+# 시스템 패키지 매니저로 재설치
+# macOS: brew reinstall ffmpeg
+# Linux: sudo apt reinstall ffmpeg
+# Windows: winget install --force ffmpeg
 ```
 
 </details>
