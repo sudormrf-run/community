@@ -11,11 +11,11 @@ import Callout from '../../../../components/Callout.astro';
 
 ## LeRobot 워크플로우 개요
 
-LeRobot으로 로봇 AI를 구축하는 과정은 다음과 같은 순환 구조를 따릅니다:
+LeRobot으로 로봇 AI를 구축하는 과정을 요약했습니다, 이대로 따라하시면 제일 쉬워요!
 
 <div style="background: var(--color-surface); border: 2px solid var(--color-border); border-radius: var(--radius-lg); padding: 2rem; margin: 2rem 0;">
   <div style="text-align: center; margin-bottom: 2rem;">
-    <h3 style="color: var(--color-accent); margin: 0;">🔄 LeRobot 전체 워크플로우</h3>
+    <h3 style="color: var(--color-accent); margin: 0;">LeRobot 전체 워크플로우</h3>
   </div>
   
   <div style="display: grid; gap: 1.5rem;">
@@ -38,8 +38,8 @@ LeRobot으로 로봇 AI를 구축하는 과정은 다음과 같은 순환 구조
     <div style="display: flex; align-items: center; gap: 1rem;">
       <div style="background: var(--color-accent); color: var(--color-bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
       <div>
-        <strong>Teleoperation 설정</strong>
-        <p style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: var(--text-sm);">원격 조작으로 로봇을 제어할 수 있게 설정합니다</p>
+        <strong>Teleoperation 셋업</strong>
+        <p style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: var(--text-sm);">카메라, 조명등 환경을 셋업 하고, 로봇을 제어해 봅니다.</p>
       </div>
     </div>
     
@@ -70,7 +70,7 @@ LeRobot으로 로봇 AI를 구축하는 과정은 다음과 같은 순환 구조
     <div style="display: flex; align-items: center; gap: 1rem;">
       <div style="background: var(--color-accent); color: var(--color-bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">7</div>
       <div>
-        <strong>모델 평가 및 배포</strong>
+        <strong>모델 적용 & 실전 테스트</strong>
         <p style="margin: 0.25rem 0 0 0; color: var(--color-text-secondary); font-size: var(--text-sm);">학습된 모델을 테스트하고 실제 로봇에 적용합니다</p>
       </div>
     </div>
@@ -78,14 +78,14 @@ LeRobot으로 로봇 AI를 구축하는 과정은 다음과 같은 순환 구조
   
   <div style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-border);">
     <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">
-      <strong>🔄 반복:</strong> 더 나은 성능을 위해 5-7 단계를 반복합니다
+      <strong>반복:</strong> 더 나은 성능을 위해 5-7 단계를 반복합니다
     </p>
   </div>
 </div>
 
 ## 단계별 상세 가이드
 
-### 1️⃣ 하드웨어 선택 및 준비
+### 1. 하드웨어 선택 및 준비
 
 LeRobot은 다양한 로봇 하드웨어를 지원합니다. 예산과 목적에 맞는 하드웨어를 선택하세요.
 
@@ -101,7 +101,7 @@ LeRobot은 다양한 로봇 하드웨어를 지원합니다. 예산과 목적에
   </a>
 </div>
 
-### 2️⃣ LeRobot 플랫폼 설치
+### 2. LeRobot 플랫폼 설치
 
 개발 환경을 구성하고 LeRobot 소프트웨어를 설치합니다.
 
@@ -112,7 +112,7 @@ LeRobot은 다양한 로봇 하드웨어를 지원합니다. 예산과 목적에
   </a>
 </div>
 
-### 3️⃣ Teleoperation 설정
+### 3. Teleoperation 설정
 
 로봇을 원격으로 제어할 수 있도록 teleoperation을 설정합니다.
 
@@ -123,7 +123,7 @@ LeRobot은 다양한 로봇 하드웨어를 지원합니다. 예산과 목적에
   </a>
 </div>
 
-### 4️⃣ 사전 학습 모델 사용하기
+### 4. 사전 학습 모델 사용하기
 
 HuggingFace에서 제공하는 사전 학습된 모델을 다운로드하고 테스트합니다.
 
@@ -141,7 +141,7 @@ policy = make_policy(
 policy.evaluate()
 ```
 
-### 5️⃣ 데이터 수집
+### 5. 데이터 수집
 
 Teleoperation을 통해 로봇을 조작하며 학습 데이터를 수집합니다.
 
@@ -152,7 +152,7 @@ Teleoperation을 통해 로봇을 조작하며 학습 데이터를 수집합니�
   </a>
 </div>
 
-### 6️⃣ 모델 학습
+### 6. 모델 학습
 
 수집한 데이터로 나만의 모델을 학습시킵니다.
 
@@ -163,7 +163,7 @@ Teleoperation을 통해 로봇을 조작하며 학습 데이터를 수집합니�
   </a>
 </div>
 
-### 7️⃣ 모델 평가 및 개선
+### 7. 모델 평가 및 개선
 
 학습된 모델을 실제 로봇에서 테스트하고 성능을 평가합니다.
 
