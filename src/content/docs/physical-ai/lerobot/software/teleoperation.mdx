@@ -7,291 +7,213 @@ import Callout from '../../../../../components/Callout.astro';
 import Tabs from '../../../../../components/Tabs.astro';
 
 <Callout type="info" title="Teleoperation이란?">
-  Teleoperation(원격 조작)은 컨트롤러나 다른 입력 장치를 사용하여 로봇을 원격으로 제어하는 기술입니다. LeRobot에서는 이를 통해 데이터를 수집하고 로봇의 동작을 테스트할 수 있습니다.
+  Teleoperation(원격 조작)은 로봇을 원격으로 제어하는 기술입니다. LeRobot에서는 주로 리더-팔로워 방식을 사용하여 직관적인 로봇 제어와 데이터 수집을 수행합니다.
 </Callout>
 
-## 개요
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 2rem 0;">
+  <iframe 
+    src="https://www.youtube.com/embed/g1j0CS0FZIA?start=23700" 
+    title="처음으로 텔레오퍼레이션 한 순간"
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: var(--radius-lg);"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    allowfullscreen
+  ></iframe>
+</div>
 
-Teleoperation은 LeRobot에서 두 가지 핵심 목적을 가집니다:
+## 리더-팔로워 방식 개요
 
-1. **데이터 수집**: 인간이 로봇을 조작하며 생성한 데이터로 Imitation Learning
-2. **테스트 및 디버깅**: 로봇의 동작을 직접 제어하며 하드웨어 검증
+리더-팔로워(Leader-Follower) 방식은 LeRobot에서 가장 직관적이고 효과적인 텔레오퍼레이션 방법입니다:
 
-## 지원되는 입력 장치
+- **리더 로봇**: 사람이 직접 손으로 움직이는 로봇
+- **팔로워 로봇**: 리더의 동작을 실시간으로 따라하는 로봇
+- **장점**: 직관적이고 정확한 제어, 고품질 데이터 수집
 
-### 1. 게임 컨트롤러
+<Callout type="tip" title="왜 리더-팔로워 방식인가?">
+  리더-팔로워 방식은 로봇의 물리적 제약을 자연스럽게 반영하며, 인간의 직관적인 움직임을 그대로 전달할 수 있어 Imitation Learning에 최적의 데이터를 제공합니다.
+</Callout>
 
-가장 일반적이고 접근하기 쉬운 방법입니다.
+## 하드웨어 준비
 
-- **PlayStation 컨트롤러** (권장)
-- **Xbox 컨트롤러**
-- **일반 USB 게임패드**
+### 필요한 장비
 
-### 2. 스페이스마우스
+1. **동일한 로봇 2대**: 리더용과 팔로워용
+2. **컴퓨터**: 두 로봇을 동시에 제어할 수 있는 시스템
+3. **USB 케이블**: 각 로봇 연결용
+4. **카메라**: 데이터 수집용 (선택사항)
 
-정밀한 6DoF(6자유도) 제어가 필요한 경우:
-
-- **3Dconnexion SpaceMouse**
-- 3D 모델링용 입력 장치를 로봇 제어에 활용
-
-### 3. 리더-팔로워 방식
-
-동일한 로봇 2대를 사용하는 고급 방식:
-
-- 한 로봇(리더)을 손으로 움직이면
-- 다른 로봇(팔로워)이 동작을 따라함
-- 가장 직관적이지만 비용이 높음
-
-## 기본 Teleoperation 설정
-
-### 1단계: 하드웨어 연결 확인
+### 로봇 연결
 
 ```bash
-# 로봇 연결 상태 확인
-python -c "from lerobot import available_robots; print(available_robots())"
+# 연결된 로봇 확인
+ls /dev/ttyUSB*
+# 일반적으로 /dev/ttyUSB0 (리더), /dev/ttyUSB1 (팔로워)
 ```
 
-### 2단계: 컨트롤러 연결
+## 리더-팔로워 설정
 
-<Tabs tabs={['PlayStation', 'Xbox', 'SpaceMouse']}>
-  <div class="tab-panel">
-    ```bash
-    # PlayStation 컨트롤러 연결
-    # 1. USB로 연결하거나
-    # 2. Bluetooth로 페어링
-    
-    # 연결 확인
-    ls /dev/input/js*
-    ```
-  </div>
-  <div class="tab-panel">
-    ```bash
-    # Xbox 컨트롤러 연결
-    # USB로 연결 후 확인
-    
-    ls /dev/input/js*
-    ```
-  </div>
-  <div class="tab-panel">
-    ```bash
-    # SpaceMouse 드라이버 설치
-    pip install pyspacemouse
-    
-    # 연결 확인
-    python -c "import pyspacemouse; print(pyspacemouse.list_devices())"
-    ```
-  </div>
-</Tabs>
-
-### 3단계: Teleoperation 실행
+### 1단계: 환경 설정
 
 ```python
 from lerobot.common.robot_devices.robots.factory import make_robot
-from lerobot.common.robot_devices.control import TeleoperationController
+from lerobot.common.robot_devices.motors.dynamixel import DynamixelMotorsBus
 
-# 로봇 초기화
-robot = make_robot(
-    robot_type="so101",  # 사용하는 로봇 타입
+# 리더 로봇 초기화
+leader = make_robot(
+    robot_type="koch",  # 또는 사용하는 로봇 타입
     robot_kwargs={
-        "port": "/dev/ttyUSB0",  # 로봇 연결 포트
+        "leader_port": "/dev/ttyUSB0",
+        "follower_port": "/dev/ttyUSB1",
     }
 )
-
-# 텔레오퍼레이션 컨트롤러 생성
-teleop = TeleoperationController(
-    robot=robot,
-    device_type="gamepad"  # 또는 "spacemouse"
-)
-
-# 텔레오퍼레이션 시작
-print("텔레오퍼레이션을 시작합니다. 'Ctrl+C'로 종료하세요.")
-teleop.run()
 ```
 
-## 컨트롤 매핑
+### 2단계: 캘리브레이션
 
-### 게임패드 기본 매핑
-
-<div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 1.5rem; margin: 1rem 0;">
-  <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">🎮 PlayStation/Xbox 컨트롤러</h4>
-  
-  - **왼쪽 조이스틱**: X/Y 축 이동
-  - **오른쪽 조이스틱**: Z 축 회전
-  - **L2/R2 트리거**: 그리퍼 열기/닫기
-  - **L1/R1 버튼**: 속도 조절
-  - **△/○/✕/□**: 사전 정의된 포즈
-  - **OPTIONS**: 긴급 정지
-</div>
-
-### 커스텀 매핑
-
-필요에 따라 컨트롤 매핑을 커스터마이즈할 수 있습니다:
+리더와 팔로워가 정확히 동기화되도록 캘리브레이션합니다:
 
 ```python
-# 커스텀 컨트롤 매핑
-custom_mapping = {
-    "left_stick_x": "joint_1",
-    "left_stick_y": "joint_2", 
-    "right_stick_x": "joint_3",
-    "right_stick_y": "joint_4",
-    "l2": "gripper_open",
-    "r2": "gripper_close",
-}
+# 로봇 캘리브레이션
+print("리더 로봇을 홈 포지션으로 이동시켜주세요...")
+leader.calibrate()
 
-teleop = TeleoperationController(
-    robot=robot,
-    device_type="gamepad",
-    control_mapping=custom_mapping
-)
+print("캘리브레이션 완료! 텔레오퍼레이션을 시작할 수 있습니다.")
 ```
 
-## 데이터 수집 모드
+### 3단계: 텔레오퍼레이션 시작
 
-Teleoperation을 통해 학습 데이터를 수집할 수 있습니다:
+```python
+# 리더-팔로워 모드 활성화
+leader.connect()
+leader.teleop_start()
+
+print("리더 로봇을 움직이면 팔로워가 따라합니다.")
+print("종료하려면 Ctrl+C를 누르세요.")
+
+try:
+    while True:
+        # 리더의 위치를 읽어서 팔로워에 전달
+        leader.teleop_step()
+except KeyboardInterrupt:
+    print("텔레오퍼레이션 종료")
+    leader.disconnect()
+```
+
+## 데이터 수집
+
+리더-팔로워 방식으로 고품질 학습 데이터를 수집합니다:
 
 ```python
 from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+from lerobot.common.robot_devices.cameras import OpenCVCamera
+
+# 카메라 설정
+cameras = {
+    "top": OpenCVCamera(camera_index=0, fps=30),
+    "wrist": OpenCVCamera(camera_index=1, fps=30)
+}
 
 # 데이터셋 생성
 dataset = LeRobotDataset(
-    repo_id="my_robot_dataset",
-    local_dir="./data"
-)
-
-# 데이터 수집 모드로 텔레오퍼레이션
-teleop = TeleoperationController(
-    robot=robot,
-    device_type="gamepad",
-    record_data=True,
-    dataset=dataset
+    repo_id="my_teleoperation_data",
+    fps=30
 )
 
 # 데이터 수집 시작
-print("데이터 수집을 시작합니다...")
-print("RECORD 버튼: 녹화 시작/중지")
-print("Ctrl+C: 세션 종료")
+episode_index = 0
+while True:
+    print(f"\n에피소드 {episode_index + 1} 시작")
+    print("준비되면 Enter, 종료하려면 'q' 입력")
+    
+    user_input = input()
+    if user_input.lower() == 'q':
+        break
+    
+    # 에피소드 녹화
+    leader.record_episode(
+        dataset=dataset,
+        episode_index=episode_index,
+        cameras=cameras
+    )
+    
+    episode_index += 1
 
-teleop.run()
+print(f"총 {episode_index}개의 에피소드 수집 완료!")
 ```
 
-<Callout type="tip" title="데이터 수집 팁">
-  - 다양한 각도와 속도로 동작 수행
-  - 각 동작을 여러 번 반복
-  - 실패 케이스도 포함하여 수집
-  - 조명과 배경을 다양하게 변경
-</Callout>
-
-## 안전 설정
+## 안전 및 주의사항
 
 ### 속도 제한
 
-로봇 손상을 방지하기 위한 속도 제한:
-
 ```python
-teleop = TeleoperationController(
-    robot=robot,
-    max_joint_speed=0.5,  # 최대 속도 50%
-    acceleration_limit=0.3  # 가속도 제한
-)
+# 안전을 위한 속도 제한 설정
+leader.set_max_speed(0.5)  # 최대 속도 50%로 제한
 ```
 
 ### 작업 공간 제한
 
-로봇의 동작 범위를 제한:
-
 ```python
+# 작업 공간 경계 설정
 workspace_limits = {
-    "x": (-0.3, 0.3),  # X축 범위: -30cm ~ 30cm
-    "y": (-0.3, 0.3),  # Y축 범위
-    "z": (0.0, 0.4),   # Z축 범위: 0 ~ 40cm
+    "x": (-0.3, 0.3),
+    "y": (-0.3, 0.3),
+    "z": (0.0, 0.4)
 }
-
-teleop = TeleoperationController(
-    robot=robot,
-    workspace_limits=workspace_limits
-)
+leader.set_workspace_limits(workspace_limits)
 ```
 
-### 긴급 정지
-
-<Callout type="warning" title="안전 주의사항">
-  항상 긴급 정지 방법을 숙지하고 있어야 합니다:
-  - **소프트웨어**: OPTIONS/START 버튼
-  - **하드웨어**: 전원 차단 스위치
-  - **프로그램**: Ctrl+C
+<Callout type="warning" title="안전 수칙">
+  - 리더 로봇을 움직일 때는 천천히, 부드럽게 조작하세요
+  - 로봇 주변에 충분한 공간을 확보하세요
+  - 비상시 즉시 전원을 차단할 수 있도록 준비하세요
 </Callout>
 
-## 고급 기능
+## 팁과 모범 사례
 
-### 실시간 시각화
+### 효과적인 데이터 수집
 
-```python
-# 실시간 로봇 상태 시각화
-teleop = TeleoperationController(
-    robot=robot,
-    enable_visualization=True,
-    viz_update_rate=30  # 30 FPS
-)
-```
+1. **다양한 시작 위치**: 매 에피소드마다 조금씩 다른 위치에서 시작
+2. **속도 변화**: 빠른 동작과 느린 동작을 적절히 섞어서 수행
+3. **실패 포함**: 완벽한 성공뿐만 아니라 실패 케이스도 수집
+4. **반복 수행**: 같은 작업을 여러 번 반복하여 다양성 확보
 
-### 힘 피드백 (지원 시)
-
-```python
-# 햅틱 피드백 활성화
-teleop = TeleoperationController(
-    robot=robot,
-    enable_force_feedback=True,
-    feedback_gain=0.5
-)
-```
-
-## 문제 해결
-
-### 일반적인 문제
+### 문제 해결
 
 <details>
-<summary>컨트롤러가 인식되지 않음</summary>
+<summary>리더와 팔로워가 동기화되지 않음</summary>
 
-```bash
-# 컨트롤러 연결 확인
-ls /dev/input/js*
-
-# 권한 문제 해결
-sudo chmod 666 /dev/input/js0
-
-# udev 규칙 추가 (영구적 해결)
-echo 'KERNEL=="js*", MODE="0666"' | sudo tee /etc/udev/rules.d/99-gamepad.rules
-sudo udevadm control --reload-rules
-```
+- 캘리브레이션 다시 수행
+- USB 케이블 연결 확인
+- 모터 ID 충돌 확인
 
 </details>
 
 <details>
-<summary>로봇이 부드럽게 움직이지 않음</summary>
+<summary>동작이 부자연스러움</summary>
 
-- 제어 주파수 확인 (최소 30Hz 권장)
-- 네트워크 지연 확인 (원격 연결 시)
-- 모터 드라이버 설정 확인
-
-</details>
-
-<details>
-<summary>데이터 수집이 되지 않음</summary>
-
-- 디스크 공간 확인
-- 카메라 연결 상태 확인
-- 데이터셋 권한 확인
+- 속도 제한 값 조정
+- 모터 게인(gain) 값 조정
+- 기계적 마찰 확인
 
 </details>
+
+## 다른 제어 방법
+
+리더-팔로워 방식 외에도 다음과 같은 방법으로 로봇을 제어할 수 있습니다:
+
+- **게임패드**: PlayStation/Xbox 컨트롤러 사용
+- **키보드**: 키보드 단축키로 제어
+- **SpaceMouse**: 3D 마우스로 정밀 제어
+
+이러한 방법들은 리더-팔로워 방식보다 직관성은 떨어지지만, 특정 상황에서 유용할 수 있습니다.
 
 ## 다음 단계
 
-Teleoperation 설정이 완료되었다면:
+리더-팔로워 텔레오퍼레이션 설정이 완료되었다면:
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0;">
   <a href="/community/docs/physical-ai/lerobot/software/data-collection" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
     <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-database"></i> 데이터 수집</h3>
-    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">효과적인 학습 데이터 수집 전략</p>
+    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">수집한 데이터 관리 및 최적화</p>
   </a>
   
   <a href="/community/docs/physical-ai/lerobot/software/training" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
