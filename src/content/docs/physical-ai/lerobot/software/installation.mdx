@@ -34,8 +34,9 @@ import Tabs from '../../../../../components/Tabs.astro';
       <div>
         안정적으로 시도하시려면 다음 사양의 <strong>데스크탑</strong>을 추천합니다:
         <ul style="margin-top: 0.5rem; margin-bottom: 0;">
-          <li>NVIDIA GPU 30시리즈 이상 (3060 Ti, 3070, 3080 등)</li>
+          <li>NVIDIA GPU 최소 30시리즈 이상 (ex. 3070)</li>
           <li>USB 포트 4개 이상 (허브 사용 시 프레임 드롭 주의)</li>
+          <li>Jetson 도 좋음</li>
         </ul>
       </div>
     </div>
@@ -43,40 +44,32 @@ import Tabs from '../../../../../components/Tabs.astro';
 </Callout>
 
 
-
-
 ## 설치 과정
 
-### 1단계: uv 설치 (권장)
+<Callout type="info" title="Python 환경 관리 도구에 대해">
+  HuggingFace 공식 설치 가이드에서는 Miniconda를 추천하지만, Python 가상환경을 관리할 수 있는 도구라면 무엇을 사용하든 상관없습니다. 
+  이 가이드에서는 최근 인기를 얻고 있는 **uv**를 사용합니다. uv는 설치 속도가 매우 빠르고 사용이 간편합니다.
+  
+  다른 옵션들:
+  - **Miniconda/Anaconda**: 전통적이고 안정적인 선택
+  - **pyenv + virtualenv**: 여러 Python 버전 관리에 유용
+  - **Poetry**: 의존성 관리가 강력한 도구
+</Callout>
+
+### 1단계: uv 설치 (필자 권장)
 
 uv는 Rust로 작성된 초고속 Python 패키지 관리자로, pip보다 10-100배 빠르고 가상환경을 자동으로 관리해줍니다.
 
-<Tabs tabs={['macOS/Linux', 'Windows']}>
-  <div class="tab-panel">
-    ```bash
-    # uv 설치
-    curl -LsSf https://astral.sh/uv/install.sh | sh
-    
-    # 또는 Homebrew 사용 (macOS)
-    brew install uv
-    
-    # 설치 확인
-    uv --version
-    ```
-  </div>
-  <div class="tab-panel">
-    ```powershell
-    # PowerShell에서 실행
-    irm https://astral.sh/uv/install.ps1 | iex
-    
-    # 또는 winget 사용
-    winget install --id=astral.uv
-    
-    # 설치 확인
-    uv --version
-    ```
-  </div>
-</Tabs>
+```bash
+# uv 설치
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 또는 Homebrew 사용 (macOS)
+brew install uv
+
+# 설치 확인
+uv --version
+```
 
 ### 2단계: LeRobot 소스 코드 다운로드
 
@@ -93,11 +86,7 @@ cd lerobot
 uv venv --python 3.10
 
 # 가상환경 활성화
-# macOS/Linux:
 source .venv/bin/activate
-
-# Windows:
-.venv\Scripts\activate
 ```
 
 <Callout type="tip">
@@ -108,7 +97,7 @@ source .venv/bin/activate
 
 영상 처리를 위해 ffmpeg가 필요합니다.
 
-<Tabs tabs={['macOS', 'Ubuntu/Linux', 'Windows']}>
+<Tabs tabs={['macOS', 'Ubuntu/Linux']}>
   <div class="tab-panel">
     ```bash
     # Homebrew로 설치
@@ -120,15 +109,6 @@ source .venv/bin/activate
     # apt로 설치
     sudo apt update
     sudo apt install ffmpeg
-    ```
-  </div>
-  <div class="tab-panel">
-    ```powershell
-    # winget으로 설치
-    winget install ffmpeg
-    
-    # 또는 Chocolatey 사용
-    choco install ffmpeg
     ```
   </div>
 </Tabs>
@@ -248,7 +228,6 @@ ffmpeg -version
 # 시스템 패키지 매니저로 재설치
 # macOS: brew reinstall ffmpeg
 # Linux: sudo apt reinstall ffmpeg
-# Windows: winget install --force ffmpeg
 ```
 
 </details>
