@@ -46,15 +46,6 @@ import Tabs from '../../../../../components/Tabs.astro';
 
 ## 설치 과정
 
-<Callout type="info" title="Python 환경 관리 도구에 대해">
-  HuggingFace 공식 설치 가이드에서는 Miniconda를 추천하지만, Python 가상환경을 관리할 수 있는 도구라면 무엇을 사용하든 상관없습니다. 
-  이 가이드에서는 최근 인기를 얻고 있는 **uv**를 사용합니다. uv는 설치 속도가 매우 빠르고 사용이 간편합니다.
-  
-  다른 옵션들:
-  - **Miniconda/Anaconda**: 전통적이고 안정적인 선택
-  - **pyenv + virtualenv**: 여러 Python 버전 관리에 유용
-  - **Poetry**: 의존성 관리가 강력한 도구
-</Callout>
 
 ### 1단계: uv 설치 (필자 권장)
 
@@ -89,9 +80,18 @@ uv venv --python 3.10
 source .venv/bin/activate
 ```
 
-<Callout type="tip">
+<Callout type="info" title="Python 환경 관리 도구에 대해">
+  HuggingFace 공식 설치 가이드에서는 Miniconda를 추천하지만, Python 가상환경을 관리할 수 있는 도구라면 무엇을 사용하든 상관없습니다. 
+  이 가이드에서는 최근 인기를 얻고 있는 **uv**를 사용합니다. uv는 설치 속도가 매우 빠르고 사용이 간편합니다.
+
   uv는 프로젝트별로 독립된 가상환경을 자동으로 관리합니다. 프로젝트 디렉토리에서 `uv pip` 명령을 사용하면 자동으로 올바른 환경을 사용합니다.
+
+  다른 옵션들:
+  - **Miniconda/Anaconda**: 전통적이고 안정적인 선택
+  - **pyenv + virtualenv**: 여러 Python 버전 관리에 유용
+  - **Poetry**: 의존성 관리가 강력한 도구
 </Callout>
+
 
 ### 4단계: ffmpeg 설치
 
@@ -120,6 +120,21 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
+### 로봇 하드웨어 드라이버
+
+실제 로봇 하드웨어를 사용할 예정이니 드라이버를 설치하세요:
+
+실제로 사용할 로봇의 모터에 맞게 필요한 드라이버를 설치하세요.
+
+```bash
+# Feetech 모터 (SO-100, SO-101)
+uv pip install -e ".[feetech]"
+
+# Dynamixel 모터 (Koch, etc.)
+uv pip install -e ".[dynamixel]"
+```
+
+
 ## 선택적 설치 옵션
 
 ### 시뮬레이션 환경
@@ -137,17 +152,6 @@ uv pip install -e ".[pusht]"
 uv pip install -e ".[aloha,pusht,xarm]"
 ```
 
-### 로봇 하드웨어 드라이버
-
-실제 로봇 하드웨어를 사용한다면 해당 드라이버를 설치하세요:
-
-```bash
-# Feetech 모터 (SO-100, SO-101)
-uv pip install -e ".[feetech]"
-
-# Dynamixel 모터
-uv pip install -e ".[dynamixel]"
-```
 
 ### 실험 추적 도구
 
@@ -175,17 +179,6 @@ python
 >>> exit()
 ```
 
-### 예제 실행
-
-간단한 예제로 설치를 확인합니다:
-
-```bash
-# 사전 학습된 정책 평가
-python lerobot/scripts/eval.py \
-    -p lerobot/diffusion_pusht \
-    -o outputs/eval/pusht
-```
-
 <Callout type="success" title="설치 완료!">
   LeRobot이 성공적으로 설치되었습니다. 이제 하드웨어를 연결하고 로봇을 제어할 준비가 되었습니다.
 </Callout>
@@ -210,10 +203,8 @@ GPU를 사용하려면 CUDA와 PyTorch가 올바르게 설치되어야 합니다
 ```bash
 # CUDA 버전 확인
 nvidia-smi
-
-# PyTorch 재설치 (CUDA 11.8 예시)
-uv pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ```
+CUDA 가 정상적으로 설치되어 있지 않다면, CUDA 셋업부터... 다시 하셔야 합니다. 
 
 </details>
 
@@ -232,14 +223,14 @@ ffmpeg -version
 
 </details>
 
-## 다음 단계
+## 다음 추천 문서
 
 설치가 완료되었으니 이제 다음 단계로 진행하세요:
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0;">
   <a href="/community/docs/physical-ai/lerobot/hardware" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
-    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-robot"></i> 하드웨어 설정</h3>
-    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">로봇 하드웨어 연결 및 설정</p>
+    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);"><i class="fas fa-robot"></i> 하드웨어 선택가이드</h3>
+    <p style="margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm);">하드웨어가 준비가 안되었다면!</p>
   </a>
   
   <a href="/community/docs/physical-ai/lerobot/software/teleoperation" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none; transition: all var(--transition-base);">
@@ -249,5 +240,5 @@ ffmpeg -version
 </div>
 
 <Callout type="info" title="추가 리소스">
-  더 자세한 정보는 [LeRobot 공식 문서](https://huggingface.co/docs/lerobot)를 참조하세요.
+  더 자세한 정보는 [LeRobot 공식 설치 문서](https://huggingface.co/docs/lerobot/main/en/installation)를 참조하세요.
 </Callout>
