@@ -10,30 +10,10 @@ import Tabs from '../../../../../components/Tabs.astro';
   Teleoperation(원격 조작)은 로봇을 원격으로 제어하는 기술입니다. LeRobot에서는 주로 리더-팔로워 방식을 사용하여 직관적인 로봇 제어와 데이터 수집을 수행합니다.
 </Callout>
 
-## 빠른 시작 예제
-
-가장 간단한 텔레오퍼레이션 명령:
-
-```bash
-# SO-101 로봇 텔레오퍼레이션
-python -m lerobot.teleoperate \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --teleop.type=so101_leader \
-    --teleop.port=/dev/ttyUSB1
-```
-
-이 명령은:
-1. 팔로워 로봇(/dev/ttyUSB0)과 리더 로봇(/dev/ttyUSB1)을 연결
-2. 필요시 자동 캘리브레이션 수행
-3. 리더를 움직이면 팔로워가 실시간으로 따라함
-
-# Teleoperation 을 처음으로 수행한 순간
-
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 2rem 0;">
   <iframe 
-    src="https://youtube.com/shorts/MGH44s5suK0?feature=share" 
-    title="처음으로 텔레오퍼레이션 한 순간"
+    src="https://youtube.com/shorts/MGH44s5suK0" 
+    title="ROBOTIS OMY Teleoperation"
     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: var(--radius-lg);"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
     allowfullscreen
