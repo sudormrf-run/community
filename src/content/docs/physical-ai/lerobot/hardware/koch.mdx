@@ -16,48 +16,34 @@ Koch v1.1은 Alexander Koch의 오리지널 저비용 로봇 디자인을 개선
   - **v1.1**: Jess Moss의 개선된 버전
 </Callout>
 
-## 🔧 주요 개선사항 (v1.1)
-
-### 하드웨어 개선
-- 나사 간섭 문제 해결
-- 표준화된 구멍 크기
-- 플라스틱에 직접 나사를 고정하는 방식 제거
-- 리더 로봇에 보드 플랫폼 추가
-- 팔로워 로봇의 바닥 물체 집기 플랫폼 추가
-
-### 제작 편의성
-- **납땜 불필요**: 모든 연결이 커넥터로 가능
-- **SolidWorks 모델 제공**: CAD 파일로 수정 가능
-- **배선 다이어그램**: 명확한 연결 가이드
-- **조립 영상**: 애니메이션 포함 상세 가이드
-
 ## 💰 비용 분석
 
-<Tabs tabs={['Koch v1.1', '오리지널 Koch']}>
+<Tabs tabs={['Koch v1.1','오리지널 Koch']}>
   <div class="tab-panel">
     ### 리더 암 (Leader Arm)
-    - 6x Dynamixel XL330-M077-T 서보
+    - 6x Dynamixel XL330-M077-T 서보 (26,400원 x6)
     - Waveshare 서보 드라이버 보드
     - 5V 전원 공급장치
-    - **예상 비용**: $199-$305
+    - **예상 비용**: 약 20만원 + @ 
     
     ### 팔로워 암 (Follower Arm)
-    - 2x Dynamixel XL430-W250-T 서보
-    - 4x Dynamixel XL330-M288-T 서보
+    - 2x Dynamixel XL430-W250-T 서보 (31,900원)
+    - 4x Dynamixel XL330-M288-T 서보 (26,400원)
     - Waveshare 서보 드라이버 보드
     - 12V 전원 공급장치
-    - **예상 비용**: $278-$368
+    - **예상 비용**: 약 20만원 + @
     
-    **총 시스템 비용**: 약 $477-$673
+    **총 시스템 비용**: 약 50만원
+    
+    <Callout type="info" title="필자 의견">
+      Koch v1.1은 비용 대비 성능이 뛰어난 로봇 팔입니다. 
+      초보자가 시작하기에 적합하며, 부품 구매와 3D 프린팅만으로 제작 가능합니다.
+      다만 Dynamixel 서보는 한국에서 구매가 더 저렴할 수 있으니 국내 공급처를 확인해보세요.
+    </Callout>
   </div>
   <div class="tab-panel">
-    ### 리더 암
-    - **예상 비용**: 약 $183
-    
-    ### 팔로워 암
-    - **예상 비용**: 약 $258
-    
-    **총 시스템 비용**: 약 $430
+   Depreacated, 아래 링크 참조  
+   https://github.com/AlexanderKoch-Koch/low_cost_robot
   </div>
 </Tabs>
 
@@ -72,6 +58,18 @@ Koch v1.1은 Alexander Koch의 오리지널 저비용 로봇 디자인을 개선
 • 권장 소재: PLA+, ABS, PETG
 ```
 
+### 조립 가이드
+
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 2rem 0;">
+  <iframe 
+    src="https://www.youtube.com/embed/8nQIg9BwwTk" 
+    title="Koch v1.1 조립 가이드"
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: var(--radius-lg);"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    allowfullscreen
+  ></iframe>
+</div>
+
 ### 전원 요구사항
 
 <Callout type="warning">
@@ -80,61 +78,24 @@ Koch v1.1은 Alexander Koch의 오리지널 저비용 로봇 디자인을 개선
   - **팔로워 암**: 12V
 </Callout>
 
-### 연결
-- 두 암은 USB-C로 컴퓨터에 연결
-- 각 암은 독립적인 전원 공급 필요
 
 ## 🚀 소프트웨어 설정
 
 ### LeRobot 통합
 
 ```bash
-# LeRobot 설치
-pip install lerobot
-
-# Dynamixel SDK 설치
-pip install dynamixel_sdk
-
-# Koch 로봇 연결 테스트
-python -m lerobot.scripts.find_devices
+uv pip install -e ".[dynamixel]"
 ```
 
-### 기본 제어 예제
 
-```python
-from lerobot import KochRobot
-
-# 로봇 초기화
-robot = KochRobot()
-robot.connect()
-
-# 텔레오퍼레이션 시작
-robot.start_teleoperation()
-```
-
-## 🎯 응용 분야
-
-### 연구 및 개발
-- **로봇 학습**: 저비용으로 ML/AI 실험
-- **시뮬레이션**: MuJoCo 통합 지원
-- **협업 로봇**: 두 팔을 이용한 작업
 
 ### 실제 응용
 - 물체 조작 및 픽앤플레이스
-- 의류 접기 등 정밀 작업
+- 의류 접기 등 작업
 - 교육 및 훈련 플랫폼
-
-## 🔑 핵심 특징
-
-### 모듈형 설계
-- 리더/팔로워 구성 분리
-- 부품별 교체 가능
-- 확장 가능한 구조
 
 ### 경량화
 - XL330 서보: 단 18g
-- 빠른 움직임 가능
-- 효율적인 전력 소비
 
 ## 📚 리소스
 
