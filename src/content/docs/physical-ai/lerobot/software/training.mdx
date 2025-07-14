@@ -12,28 +12,26 @@ import Tabs from '../../../../../components/Tabs.astro';
 
 ## 학습 개요
 
-LeRobot에서 지원하는 주요 학습 알고리즘:
+LeRobot에서 지원하는 주요 Policy (Model):
 
-1. **ACT (Action Chunking with Transformers)**: Transformer 기반의 최신 알고리즘
+1. **ACT (Action Chunking with Transformers)**: Transformer 기반의 액션 모델
 2. **Diffusion Policy**: 확산 모델을 활용한 정책 학습
-3. **TDMPC**: 모델 기반 예측 제어
-4. **VLA (Vision-Language-Action)**: 비전-언어 모델 기반 (SmolVLA)
+3. **VLA (Vision-Language-Action)**: 비전-언어 모델 기반 (SmolVLA)
+4. OpenPi NVIDIA GROOT 등 다양한 모델이 계속 지원 되고 있으니 확인해보세요.
+
+모델을 고르고 학습시키면 됩니다, 처음 학습해보시는 것이라면 ACT 를 추천합니다. 가장 가볍고 쉽습니다. 
 
 ## 학습 환경 준비
 
 ### GPU 설정
 
 <Callout type="warning" title="GPU 권장사항">
-  효율적인 학습을 위해 CUDA 지원 GPU (최소 8GB VRAM)를 권장합니다.
+  효율적인 학습을 위해 CUDA 지원 GPU (최소 RTX3080)를 권장합니다.
 </Callout>
 
 ```bash
 # CUDA 확인
 nvidia-smi
-
-# PyTorch GPU 사용 확인
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-python -c "import torch; print(f'GPU: {torch.cuda.get_device_name(0)}')"
 ```
 
 ### 학습 환경 설정
@@ -47,319 +45,66 @@ os.environ['WANDB_MODE'] = 'online'  # Weights & Biases 로깅
 
 ## 기본 학습 실행
 
-### 1단계: 데이터셋 준비
-
-```python
-from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
-
-# 로컬 데이터셋 로드
-dataset = LeRobotDataset(
-    repo_id="my_dataset",
-    local_dir="./data/my_dataset"
-)
-
-# 또는 HuggingFace Hub에서 로드
-dataset = LeRobotDataset(
-    repo_id="lerobot/pusht",
-    version="v2"
-)
-
-print(f"총 에피소드 수: {len(dataset)}")
-print(f"관측 공간: {dataset.observation_space}")
-print(f"행동 공간: {dataset.action_space}")
-```
-
-### 2단계: 정책 모델 선택
-
-```python
-from lerobot.common.policies.factory import make_policy
-
-# ACT 정책 생성
-policy = make_policy(
-    policy_name="act",
-    dataset=dataset,
-    device="cuda"
-)
-
-# 또는 Diffusion Policy
-policy = make_policy(
-    policy_name="diffusion",
-    dataset=dataset,
-    device="cuda"
-)
-```
-
-### 3단계: 학습 실행
-
 ```bash
 # 명령줄에서 실행
 python lerobot/scripts/train.py \
     --dataset-repo-id "my_dataset" \
     --policy "act" \
     --device "cuda" \
-    --output-dir "./outputs/act_training" \
-    --num-epochs 100
+    --output-dir "./outputs/act_training" 
 ```
-
-또는 Python 스크립트로:
-
-```python
-from lerobot.scripts.train import train
-
-# 학습 설정
-config = {
-    "dataset_repo_id": "my_dataset",
-    "policy": "act",
-    "device": "cuda",
-    "batch_size": 32,
-    "learning_rate": 1e-4,
-    "num_epochs": 100,
-    "save_freq": 10,
-    "eval_freq": 5,
-    "output_dir": "./outputs/act_training"
-}
-
-# 학습 시작
-train(**config)
-```
-
-## 고급 학습 설정
-
-### 하이퍼파라미터 튜닝
-
-<Tabs tabs={['ACT', 'Diffusion Policy', 'TDMPC']}>
-  <div class="tab-panel">
-    ```python
-    # ACT 하이퍼파라미터
-    act_config = {
-        "chunk_size": 100,  # 액션 청크 크기
-        "n_encoder_layers": 4,
-        "n_decoder_layers": 7,
-        "n_heads": 8,
-        "d_model": 512,
-        "d_feedforward": 2048,
-        "dropout": 0.1,
-        "learning_rate": 1e-4,
-        "weight_decay": 1e-4,
-        "warmup_steps": 1000
-    }
-    
-    policy = make_policy(
-        "act",
-        dataset=dataset,
-        **act_config
-    )
-    ```
-  </div>
-  <div class="tab-panel">
-    ```python
-    # Diffusion Policy 하이퍼파라미터
-    diffusion_config = {
-        "num_diffusion_steps": 100,
-        "noise_scheduler": "ddpm",
-        "prediction_type": "epsilon",
-        "beta_schedule": "squaredcos_cap_v2",
-        "clip_sample": True,
-        "learning_rate": 1e-4,
-        "ema_decay": 0.999
-    }
-    
-    policy = make_policy(
-        "diffusion",
-        dataset=dataset,
-        **diffusion_config
-    )
-    ```
-  </div>
-  <div class="tab-panel">
-    ```python
-    # TDMPC 하이퍼파라미터
-    tdmpc_config = {
-        "horizon": 5,
-        "n_iterations": 10,
-        "population_size": 512,
-        "elite_ratio": 0.1,
-        "temperature": 0.5,
-        "momentum": 0.1,
-        "learning_rate": 3e-4,
-        "model_lr": 1e-3
-    }
-    
-    policy = make_policy(
-        "tdmpc",
-        dataset=dataset,
-        **tdmpc_config
-    )
-    ```
-  </div>
-</Tabs>
-
-### 데이터 증강
-
-```python
-from lerobot.common.datasets.transforms import get_transform
-
-# 데이터 증강 설정
-transform = get_transform(
-    "default",
-    augment_kwargs={
-        "random_crop": {"size": (224, 224)},
-        "color_jitter": {"brightness": 0.1, "contrast": 0.1},
-        "random_horizontal_flip": {"p": 0.5},
-        "gaussian_noise": {"std": 0.01}
-    }
-)
-
-dataset.set_transform(transform)
-```
-
-### 학습 모니터링
-
-```python
-# Weights & Biases 설정
-import wandb
-
-wandb.init(
-    project="lerobot-training",
-    config=config,
-    tags=["act", "pick_and_place"]
-)
-
-# 텐서보드 사용
-from torch.utils.tensorboard import SummaryWriter
-writer = SummaryWriter(log_dir="./logs")
-```
-
-## 학습 최적화 기법
-
-### 1. 커리큘럼 학습
-
-```python
-# 난이도별 데이터셋 분리
-easy_dataset = dataset.filter(lambda x: x["difficulty"] == "easy")
-medium_dataset = dataset.filter(lambda x: x["difficulty"] == "medium")
-hard_dataset = dataset.filter(lambda x: x["difficulty"] == "hard")
-
-# 단계별 학습
-for stage, stage_dataset in enumerate([easy_dataset, medium_dataset, hard_dataset]):
-    print(f"Stage {stage + 1} 학습 중...")
-    train(
-        dataset=stage_dataset,
-        policy=policy,
-        num_epochs=30
-    )
-```
-
-### 2. 멀티태스크 학습
-
-```python
-# 여러 작업 동시 학습
-multitask_config = {
-    "tasks": ["pick", "place", "push"],
-    "task_weights": [0.4, 0.4, 0.2],
-    "shared_encoder": True,
-    "task_specific_heads": True
-}
-
-policy = make_policy(
-    "act",
-    dataset=dataset,
-    multitask=True,
-    **multitask_config
-)
-```
-
-### 3. 온라인 학습
-
-```python
-# 실시간 데이터로 지속적 학습
-from lerobot.common.robot_devices.robots.factory import make_robot
-
-robot = make_robot("so101")
-online_buffer = ReplayBuffer(capacity=10000)
-
-# 온라인 학습 루프
-while True:
-    # 로봇으로 새 데이터 수집
-    new_data = collect_online_data(robot)
-    online_buffer.add(new_data)
-    
-    # 주기적으로 모델 업데이트
-    if len(online_buffer) % 100 == 0:
-        policy.update(online_buffer.sample(batch_size=32))
-```
-
-## 모델 평가
-
-### 시뮬레이션 평가
-
-```python
-from lerobot.scripts.eval import evaluate
-
-# 시뮬레이션에서 평가
-eval_results = evaluate(
-    policy=policy,
-    env_name="pusht",
-    num_episodes=100,
-    device="cuda"
-)
-
-print(f"성공률: {eval_results['success_rate']:.2%}")
-print(f"평균 리워드: {eval_results['mean_reward']:.2f}")
-```
-
 ### 실제 로봇 평가
 
-```python
-# 실제 로봇에서 평가
-from lerobot.common.robot_devices.robots.factory import make_robot
+학습된 모델을 실제 로봇에서 평가:
 
-robot = make_robot("so101")
-policy.eval()
-
-success_count = 0
-total_episodes = 50
-
-for episode in range(total_episodes):
-    success = evaluate_on_robot(robot, policy)
-    if success:
-        success_count += 1
-    print(f"Episode {episode + 1}: {'성공' if success else '실패'}")
-
-print(f"실제 성공률: {success_count / total_episodes:.2%}")
+```bash
+# 로봇에서 모델 평가 실행
+python -m lerobot.evaluate \
+    --policy.checkpoint="outputs/act_training/checkpoint_100000" \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --robot.id=my_robot \
+    --num_episodes=50 \
+    --device=cuda
 ```
+
+평가 결과는 자동으로 성공률과 함께 표시됩니다.
 
 ## 모델 저장 및 배포
 
-### 모델 저장
+### 모델을 HuggingFace Hub에 업로드
 
-```python
-# 체크포인트 저장
-policy.save_pretrained("./models/my_trained_policy")
-
-# HuggingFace Hub에 업로드
-policy.push_to_hub(
-    repo_id="my_org/my_robot_policy",
-    commit_message="Trained on pick and place task"
-)
+```bash
+# 학습된 모델을 HuggingFace Hub에 업로드
+python -m lerobot.push_model \
+    --checkpoint-dir="./outputs/act_training/checkpoint_100000" \
+    --repo-id="my_username/my_robot_policy" \
+    --policy-name="act" \
+    --tags="pick_place,so101" \
+    --license="mit"
 ```
 
-### 모델 로드 및 사용
+### 모델 다운로드 및 사용
 
-```python
-# 저장된 모델 로드
-from lerobot.common.policies.factory import make_policy
+```bash
+# HuggingFace Hub에서 모델 다운로드
+python -m lerobot.download_model \
+    --repo-id="lerobot/act_pusht" \
+    --local-dir="./models/act_pusht"
 
-policy = make_policy(
-    "lerobot/act_pusht",
-    device="cuda"
-)
-
-# 추론 모드
-policy.eval()
-with torch.no_grad():
-    action = policy.predict(observation)
+# 다운로드한 모델로 추론 실행
+python -m lerobot.inference \
+    --policy.checkpoint="./models/act_pusht" \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --robot.cameras="{ front: {type: opencv, index_or_path: 0} }" \
+    --display_data=true
 ```
+
+<Callout type="tip" title="모델 공유">
+  학습한 모델을 HuggingFace Hub에 공유하면 다른 사람들도 사용할 수 있습니다. 
+  모델 카드에 학습 데이터셋, 하드웨어 정보, 성능 지표를 포함하세요.
+</Callout>
 
 ## 문제 해결
 
