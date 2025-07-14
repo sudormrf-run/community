@@ -37,7 +37,7 @@ LeRobot에서 데이터 수집은 다음 요소로 구성됩니다:
 
 1. **로봇 상태**: 관절 각도
 2. **시각 정보**: RGB 카메라 이미지 (Depth 카메라도 가능함)
-3. **명령**: Instruction
+3. **명령**: Instruction, 텍스트로 내린 명령
 
 ## 데이터 수집 준비
 
@@ -59,56 +59,31 @@ LeRobot에서 데이터 수집은 다음 요소로 구성됩니다:
 
 ### 2단계: 카메라 설정
 
-카메라가 제대로 연결되었는지 확인:
+카메라 위치와 연결을 확인합니다.  
+카메라는 동작시에 가려서 안보이는 부분이 없는지 확인해야합니다. 
+실제 데이터 수집시에 화면이 보이니 꼭 화면을 확인하세요.
 
-```bash
-# Linux에서 카메라 장치 확인
-ls /dev/video*
 
-# 카메라 정보 확인 (v4l2-utils 필요)
-v4l2-ctl --list-devices
-
-# 카메라 테스트
-python -c "import cv2; print('Camera available:', cv2.VideoCapture(0).isOpened())"
-```
-
-### 3단계: 데이터셋 준비
-
-데이터 수집을 위한 디렉토리 구조 생성:
-
-```bash
-# 데이터 수집 디렉토리 생성
-mkdir -p data/my_robot_dataset
-
-# 작업 이름과 타임스탬프로 데이터셋 이름 생성
-TASK_NAME="pick_and_place"
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-DATASET_NAME="${TASK_NAME}_${TIMESTAMP}"
-
-echo "Dataset name: $DATASET_NAME"
-```
 
 ## 데이터 수집 실행
+
+### HuggingFace 셋업
+
+기본적으로 데이터셋은 huggingface hub 과 연동되어 관리됩니다.  
+미리 로그인 해두시면 자동으로 업로드되니 계정 셋업을 먼저 하세요.
+Private 하게 관리할 수도 있습니다. 
+
+수집한 데이터셋을 공유하려면:
+
+```bash
+# HuggingFace CLI 로그인
+huggingface-cli login
+```
 
 ### LeRobot record 명령 사용
 
 텔레오퍼레이션과 함께 데이터를 수집하는 가장 간단한 방법:
 
-```bash
-# 기본 데이터 수집 (SO-101 예시)
-python -m lerobot.record \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --robot.id=follower_arm \
-    --teleop.type=so101_leader \
-    --teleop.port=/dev/ttyUSB1 \
-    --teleop.id=leader_arm \
-    --dataset.repo_id="my_username/pick_place_dataset" \
-    --dataset.num_episodes=100 \
-    --dataset.fps=30
-```
-
-### 카메라를 포함한 데이터 수집
 
 ```bash
 # 카메라 2대를 사용한 데이터 수집
@@ -150,13 +125,12 @@ python -m lerobot.record \
 ### 2. 실패 데이터 포함
 
 <Callout type="warning" title="실패 데이터의 중요성">
-  실패 사례도 학습에 중요합니다. 로봇이 어떤 행동을 피해야 하는지 학습할 수 있습니다.
+  실패 사례도 학습에 중요합니다. 로봇이 Failure 를 Recover 하는 것도 학습해야만 합니다. (ex. 놓치면 다시 집기)
 </Callout>
 
 데이터 수집 중 다음과 같은 케이스를 포함하세요:
 - ✅ 완벽한 성공 케이스
-- ⚠️ 부분적 성공 (목표는 달성했지만 비효율적)
-- ❌ 실패 케이스 (물체를 떨어뜨림, 잘못된 위치 등)
+- ❌ 실패 케이스 (물체를 떨어뜨림, 잘못된 위치, 돌발 상황에 대처하는 데이터)
 
 ### 3. 품질 관리
 
@@ -202,76 +176,32 @@ python -m lerobot.record \
 
 ## 효율적인 데이터 수집 팁
 
-### 1. 배치 수집 계획
-
-체계적인 데이터 수집을 위한 스크립트 예시:
-
-```bash
-#!/bin/bash
-# collect_batch.sh - 배치 데이터 수집 스크립트
-
-# 쉬운 작업 (30 에피소드)
-echo "=== Easy Tasks: Simple Pick and Place ==="
-python -m lerobot.record \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --teleop.type=so101_leader \
-    --teleop.port=/dev/ttyUSB1 \
-    --dataset.repo_id="my_username/easy_pick_place" \
-    --dataset.num_episodes=30
-
-# 중간 작업 (50 에피소드)
-echo "=== Medium Tasks: With Obstacles ==="
-python -m lerobot.record \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --teleop.type=so101_leader \
-    --teleop.port=/dev/ttyUSB1 \
-    --dataset.repo_id="my_username/medium_pick_place" \
-    --dataset.num_episodes=50
-
-# 어려운 작업 (20 에피소드)
-echo "=== Hard Tasks: Precise Manipulation ==="
-python -m lerobot.record \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --teleop.type=so101_leader \
-    --teleop.port=/dev/ttyUSB1 \
-    --dataset.repo_id="my_username/hard_pick_place" \
-    --dataset.num_episodes=20
-```
-
-### 2. 효율적인 수집 전략
+### 1. 효율적인 수집 전략
 
 <Callout type="tip" title="수집 효율 높이기">
-  - **쉬운 작업부터 시작**: 로봇 조작에 익숙해진 후 복잡한 작업으로 진행
-  - **휴식 시간 확보**: 30분마다 5분 휴식으로 일관된 품질 유지
+  - **휴식 시간 확보**: 에피소드 사이에 충분한 휴식으로 일관된 품질 유지
   - **다양한 시간대**: 조명 조건이 다른 시간대에 수집하여 강건성 확보
 </Callout>
 
-### 3. 데이터 증강 고려사항
+생각보다 힘듧니다, 쉬는 시간을 충분히 가져가세요.  
+조명이 완벽 통제가 안된다면 다양한 빛 상황에서 수집하세요.
+
+### 2. 데이터 다양성 고려사항
 
 수집 단계에서 자연스러운 다양성 확보:
 - 📐 **시작 위치 변화**: 매 에피소드마다 약간씩 다른 위치에서 시작
 - 🎨 **물체 다양성**: 색상, 크기, 재질이 다른 물체 사용
 - 💡 **환경 변화**: 배경이나 조명을 점진적으로 변경
 
-## 데이터셋 관리
+실제 작업을 수행할 환경에 맞춰 필요한 다양성을 확보하세요.  
 
-### HuggingFace Hub에 업로드
+[참고] Digital Cousin 의 개념을 도입하여 다양한 데이터 증강 방법이 연구 되고 있습니다. 특히 NVIDIA 가 열심히 합니다. 근 미래에는 조금의 환경 변화는 가상으로 해결될 지도...
 
-수집한 데이터셋을 공유하려면:
 
-```bash
-# HuggingFace CLI 로그인
-huggingface-cli login
 
-# 데이터셋 업로드
-python -m lerobot.push_dataset \
-    --dataset.repo_id="my_username/my_robot_dataset" \
-    --dataset.local_dir="./data/my_dataset" \
-    --private=false
-```
+## 데이터셋 다루기
+
+작성일 (25년 7월) 기준, 데이터셋 다루는 기능이 아직 많이 부족하고 활발히 추가 중 입니다. 최신 github repo 를 확인하는 것이 정확합니다.  
 
 ### 데이터셋 다운로드 및 병합
 
@@ -297,6 +227,29 @@ merged.push_to_hub('user/merged_dataset')
 
 ### 데이터셋 시각화 및 검토
 
+HuggingFace LeRobot 데이터 시각화 도구를 사용하여 데이터셋을 탐색할 수 있습니다:
+
+<div style="background: var(--color-surface); border: 2px solid var(--color-accent); border-radius: var(--radius-lg); padding: 1.5rem; margin: 2rem 0;">
+  <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">
+    <i class="fas fa-chart-line"></i> LeRobot 데이터 시각화 도구
+  </h4>
+  <p style="margin-bottom: 1rem;">
+    HuggingFace에서 제공하는 웹 기반 데이터셋 시각화 도구로, 
+    카메라 뷰, 로봇 상태, 액션 시퀀스를 인터랙티브하게 탐색할 수 있습니다.
+  </p>
+  <a 
+    href="https://huggingface.co/spaces/lerobot/visualize_dataset" 
+    target="_blank"
+    style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--color-accent); color: var(--color-bg); text-decoration: none; border-radius: var(--radius-md); font-weight: 600; transition: all var(--transition-base);"
+    onmouseover="this.style.opacity='0.9'"
+    onmouseout="this.style.opacity='1'"
+  >
+    <i class="fas fa-external-link-alt"></i> HuggingFace 데이터 시각화 도구 열기
+  </a>
+</div>
+
+또는 아래 방법으로 로컬에서 직접 열람할 수 있습니다: 
+
 ```bash
 # 웹 인터페이스로 데이터셋 탐색
 python -m lerobot.serve_dataset \
@@ -319,9 +272,9 @@ python -m lerobot.visualize \
 <details>
 <summary>카메라 프레임 드롭</summary>
 
+- USB 허브 없이 바로 연결하기
 - 카메라 해상도 낮추기
 - USB 3.0 포트 사용
-- 다른 USB 장치 분리
 
 </details>
 
@@ -335,13 +288,6 @@ python -m lerobot.visualize \
 </details>
 
 <details>
-<summary>데이터 불일치</summary>
-
-- 타임스탬프 동기화 확인
-- 모든 센서의 샘플링 레이트 일치
-- NTP 시간 동기화 사용
-
-</details>
 
 ## 다음 단계
 
