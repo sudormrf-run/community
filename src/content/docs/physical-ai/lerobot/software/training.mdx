@@ -34,38 +34,98 @@ LeRobot에서 지원하는 주요 Policy (Model):
 nvidia-smi
 ```
 
-### 학습 환경 설정
-
-```python
-# 환경 변수 설정
-import os
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # GPU 0 사용
-os.environ['WANDB_MODE'] = 'online'  # Weights & Biases 로깅
-```
 
 ## 기본 학습 실행
 
 ```bash
 # 명령줄에서 실행
-python lerobot/scripts/train.py \
-    --dataset-repo-id "my_dataset" \
-    --policy "act" \
-    --device "cuda" \
-    --output-dir "./outputs/act_training" 
+python -m lerobot.scripts.train \
+  --dataset.repo_id=${HF_USER}/so101_test \
+  --policy.type=act \
+  --output_dir=outputs/train/act_so101_test \
+  --job_name=act_so101_test \
+  --policy.device=cuda \
+  --wandb.enable=true \
+  --policy.repo_id=${HF_USER}/my_policy
 ```
+
+학습하던 checkpoint 에 이어서 학습하기
+
+```bash
+python -m lerobot.scripts.train \
+  --config_path=outputs/train/act_so101_test/checkpoints/last/pretrained_model/train_config.json \
+  --resume=true
+```
+
+### Jupyter Notebook 학습 예시
+
+실제 학습 과정을 단계별로 따라해볼 수 있는 공식 노트북입니다:
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+  <div style="background: var(--color-surface); border: 2px solid var(--color-accent); border-radius: var(--radius-lg); padding: 1.5rem;">
+    <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">
+      <i class="fas fa-robot"></i> ACT 학습 노트북
+    </h4>
+    <p style="margin-bottom: 1rem; color: var(--color-text-secondary); font-size: var(--text-sm);">
+      Action Chunking with Transformers 모델을 처음부터 학습시키는 완전한 예제입니다.
+      데이터 로드부터 학습, 평가까지 모든 과정을 포함합니다.
+    </p>
+    <a 
+      href="https://github.com/huggingface/notebooks/blob/main/lerobot/training-act.ipynb" 
+      target="_blank"
+      style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--color-accent); color: var(--color-bg); text-decoration: none; border-radius: var(--radius-md); font-weight: 600; transition: all var(--transition-base);"
+      onmouseover="this.style.opacity='0.9'"
+      onmouseout="this.style.opacity='1'"
+    >
+      <i class="fab fa-github"></i> ACT 노트북 열기
+    </a>
+  </div>
+
+  <div style="background: var(--color-surface); border: 2px solid var(--color-green); border-radius: var(--radius-lg); padding: 1.5rem;">
+    <h4 style="margin: 0 0 1rem 0; color: var(--color-green);">
+      <i class="fas fa-language"></i> SmolVLA 학습 노트북
+    </h4>
+    <p style="margin-bottom: 1rem; color: var(--color-text-secondary); font-size: var(--text-sm);">
+      Vision-Language-Action 모델 학습 예제입니다.
+      자연어 명령으로 로봇을 제어하는 최신 기술을 배울 수 있습니다.
+    </p>
+    <a 
+      href="https://github.com/huggingface/notebooks/blob/main/lerobot/training-smolvla.ipynb" 
+      target="_blank"
+      style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; background: var(--color-green); color: var(--color-bg); text-decoration: none; border-radius: var(--radius-md); font-weight: 600; transition: all var(--transition-base);"
+      onmouseover="this.style.opacity='0.9'"
+      onmouseout="this.style.opacity='1'"
+    >
+      <i class="fab fa-github"></i> SmolVLA 노트북 열기
+    </a>
+  </div>
+</div>
+
+<Callout type="tip" title="Colab에서 실행하기">
+  노트북을 다운로드하여 Google Colab에서 실행하면 무료 GPU를 사용할 수 있습니다.
+  단, Colab의 제한된 리소스로는 전체 학습이 어려울 수 있으니 작은 데이터셋으로 테스트해보세요.
+</Callout>
+
+
 ### 실제 로봇 평가
 
 학습된 모델을 실제 로봇에서 평가:
 
 ```bash
-# 로봇에서 모델 평가 실행
-python -m lerobot.evaluate \
-    --policy.checkpoint="outputs/act_training/checkpoint_100000" \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --robot.id=my_robot \
-    --num_episodes=50 \
-    --device=cuda
+# ㅓ봇에서 모델 평가 실행
+python -m lerobot.record  \
+  --robot.type=so100_follower \
+  --robot.port=/dev/ttyACM1 \
+  --robot.cameras="{ up: {type: opencv, index_or_path: /dev/video10, width: 640, height: 480, fps: 30}, side: {type: intelrealsense, serial_number_or_name: 233522074606, width: 640, height: 480, fps: 30}}" \
+  --robot.id=my_awesome_follower_arm \
+  --display_data=false \
+  --dataset.repo_id=${HF_USER}/eval_so100 \
+  --dataset.single_task="Put lego brick into the transparent box" \
+  # <- Teleop optional if you want to teleoperate in between episodes \
+  # --teleop.type=so100_leader \
+  # --teleop.port=/dev/ttyACM0 \
+  # --teleop.id=my_awesome_leader_arm \
+  --policy.path=${HF_USER}/my_policy
 ```
 
 평가 결과는 자동으로 성공률과 함께 표시됩니다.
@@ -76,30 +136,11 @@ python -m lerobot.evaluate \
 
 ```bash
 # 학습된 모델을 HuggingFace Hub에 업로드
-python -m lerobot.push_model \
-    --checkpoint-dir="./outputs/act_training/checkpoint_100000" \
-    --repo-id="my_username/my_robot_policy" \
-    --policy-name="act" \
-    --tags="pick_place,so101" \
-    --license="mit"
+CKPT=010000
+huggingface-cli upload ${HF_USER}/act_so101_test${CKPT} \
+  outputs/train/act_so101_test/checkpoints/${CKPT}/pretrained_model
 ```
 
-### 모델 다운로드 및 사용
-
-```bash
-# HuggingFace Hub에서 모델 다운로드
-python -m lerobot.download_model \
-    --repo-id="lerobot/act_pusht" \
-    --local-dir="./models/act_pusht"
-
-# 다운로드한 모델로 추론 실행
-python -m lerobot.inference \
-    --policy.checkpoint="./models/act_pusht" \
-    --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0 \
-    --robot.cameras="{ front: {type: opencv, index_or_path: 0} }" \
-    --display_data=true
-```
 
 <Callout type="tip" title="모델 공유">
   학습한 모델을 HuggingFace Hub에 공유하면 다른 사람들도 사용할 수 있습니다. 
@@ -109,55 +150,6 @@ python -m lerobot.inference \
 ## 문제 해결
 
 ### 일반적인 문제들
-
-<details>
-<summary>학습이 수렴하지 않음</summary>
-
-- 학습률 조정 (보통 1e-3 ~ 1e-5)
-- 배치 크기 조정
-- 데이터 정규화 확인
-- 그래디언트 클리핑 적용
-
-```python
-optimizer = torch.optim.Adam(
-    policy.parameters(),
-    lr=1e-4,
-    weight_decay=1e-5
-)
-
-# 그래디언트 클리핑
-torch.nn.utils.clip_grad_norm_(policy.parameters(), max_norm=1.0)
-```
-
-</details>
-
-<details>
-<summary>과적합 문제</summary>
-
-- 데이터 증강 강화
-- 드롭아웃 비율 증가
-- 조기 종료(Early Stopping) 적용
-- 더 많은 데이터 수집
-
-</details>
-
-<details>
-<summary>메모리 부족</summary>
-
-- 배치 크기 감소
-- 그래디언트 축적 사용
-- 혼합 정밀도 학습 활성화
-
-```python
-# 혼합 정밀도 학습
-from torch.cuda.amp import autocast, GradScaler
-
-scaler = GradScaler()
-with autocast():
-    loss = policy.compute_loss(batch)
-```
-
-</details>
 
 ## 다음 단계
 
