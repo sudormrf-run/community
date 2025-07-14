@@ -12,25 +12,23 @@ import Tabs from '../../../../../components/Tabs.astro';
 
 ### 데이터셋 예시
 
-LeRobot으로 수집된 실제 데이터셋을 확인해보세요:
+LeRobot으로 수집된 실제 체스 로봇 데이터셋의 예시입니다. 1500개의 체스 움직임을 학습한 ACT 모델의 데이터를 시각화한 것입니다:
 
-<div style="background: var(--color-surface); border: 2px solid var(--color-accent); border-radius: var(--radius-lg); padding: 1.5rem; margin: 2rem 0;">
-  <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">
-    <i class="fas fa-chess"></i> 체스 로봇 데이터셋 시각화
-  </h4>
-  <p style="margin-bottom: 1rem;">
-    1500개의 체스 움직임을 학습한 ACT 모델의 데이터셋입니다. 
-    로봇의 관절 상태, 카메라 이미지, 액션 시퀀스를 확인할 수 있습니다.
-  </p>
-  <a 
-    href="https://huggingface.co/spaces/lerobot/visualize_dataset?path=%2Fdopaul%2Feval_1500_chess_moves_act_240k%2Fepisode_0" 
-    target="_blank"
-    style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--color-accent); color: var(--color-bg); text-decoration: none; border-radius: var(--radius-md); font-weight: 600; transition: all var(--transition-base);"
-    onmouseover="this.style.opacity='0.9'"
-    onmouseout="this.style.opacity='1'"
-  >
-    <i class="fas fa-external-link-alt"></i> HuggingFace에서 데이터셋 탐색하기
-  </a>
+<div style="margin: 2rem 0;">
+  <img 
+    src="/community/images/lerobot/lerobot_chess_visualize.png" 
+    alt="LeRobot 체스 데이터셋 시각화 - 카메라 뷰와 로봇 관절 데이터"
+    style="width: 100%; border-radius: var(--radius-lg); border: 2px solid var(--color-border);"
+  />
+  <div style="text-align: center; margin-top: 1rem;">
+    <a 
+      href="https://huggingface.co/spaces/lerobot/visualize_dataset?path=%2Fdopaul%2Feval_1500_chess_moves_act_240k%2Fepisode_0" 
+      target="_blank"
+      style="color: var(--color-accent); text-decoration: none; font-size: var(--text-sm);"
+    >
+      <i class="fas fa-external-link-alt"></i> HuggingFace에서 인터랙티브하게 탐색하기
+    </a>
+  </div>
 </div>
 
 ## 데이터 수집 개요
@@ -38,9 +36,8 @@ LeRobot으로 수집된 실제 데이터셋을 확인해보세요:
 LeRobot에서 데이터 수집은 다음 요소로 구성됩니다:
 
 1. **로봇 상태**: 관절 각도
-2. **시각 정보**: RGB 카메라 이미지
-3. **행동 정보**: 제어 명령과 타이밍
-4. **메타데이터**: 작업 정보, 성공/실패 여부
+2. **시각 정보**: RGB 카메라 이미지 (Depth 카메라도 가능함)
+3. **명령**: Instruction
 
 ## 데이터 수집 준비
 
@@ -50,95 +47,92 @@ LeRobot에서 데이터 수집은 다음 요소로 구성됩니다:
   학습 성능을 위해 데이터 수집 환경을 일관되게 유지하는 것이 중요합니다.
 </Callout>
 
-```python
-# 작업 환경 체크리스트
-environment_checklist = {
-    "lighting": "일정한 조명 유지",
-    "camera_position": "고정된 카메라 위치",
-    "workspace": "정리된 작업 공간",
-    "objects": "일관된 물체 배치"
-}
-```
+작업 환경 체크리스트:
+- **조명**: 일정한 조명 유지
+- **카메라 위치**: 고정된 카메라 위치
+- **작업 공간**: 정리된 작업 공간  
+- **물체 배치**: 일관된 물체 배치
+
+<Callout type="tip" title="작업별 환경 설정">
+  데이터가 일관적일수록 학습이 빠릅니다. 하지만 다양하게 어질러진 물체를 정리하는 것이 목표라면 당연히 물체 위치가 다양해야겠죠?
+</Callout>
 
 ### 2단계: 카메라 설정
 
-```python
-from lerobot.common.robot_devices.cameras.factory import make_camera
+카메라가 제대로 연결되었는지 확인:
 
-# 카메라 초기화
-camera = make_camera(
-    camera_type="opencv",
-    camera_kwargs={
-        "camera_index": 0,  # 웹캠 인덱스
-        "fps": 30,
-        "width": 640,
-        "height": 480
-    }
-)
+```bash
+# Linux에서 카메라 장치 확인
+ls /dev/video*
 
-# 카메라 캘리브레이션
-camera.calibrate()
+# 카메라 정보 확인 (v4l2-utils 필요)
+v4l2-ctl --list-devices
+
+# 카메라 테스트
+python -c "import cv2; print('Camera available:', cv2.VideoCapture(0).isOpened())"
 ```
 
-### 3단계: 데이터셋 생성
+### 3단계: 데이터셋 준비
 
-```python
-from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
-from datetime import datetime
+데이터 수집을 위한 디렉토리 구조 생성:
 
-# 데이터셋 이름 생성
-task_name = "pick_and_place"
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-dataset_name = f"{task_name}_{timestamp}"
+```bash
+# 데이터 수집 디렉토리 생성
+mkdir -p data/my_robot_dataset
 
-# 데이터셋 초기화
-dataset = LeRobotDataset(
-    repo_id=f"my_org/{dataset_name}",
-    local_dir=f"./data/{dataset_name}",
-    fps=30
-)
+# 작업 이름과 타임스탬프로 데이터셋 이름 생성
+TASK_NAME="pick_and_place"
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+DATASET_NAME="${TASK_NAME}_${TIMESTAMP}"
+
+echo "Dataset name: $DATASET_NAME"
 ```
 
 ## 데이터 수집 실행
 
-### 기본 수집 스크립트
+### LeRobot record 명령 사용
 
-```python
-from lerobot.scripts.collect_data import collect_data
+텔레오퍼레이션과 함께 데이터를 수집하는 가장 간단한 방법:
 
-# 데이터 수집 실행
-collect_data(
-    robot=robot,
-    dataset=dataset,
-    camera=camera,
-    episodes=100,  # 수집할 에피소드 수
-    episode_length=1000,  # 각 에피소드의 최대 길이
-)
+```bash
+# 기본 데이터 수집 (SO-101 예시)
+python -m lerobot.record \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --robot.id=follower_arm \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyUSB1 \
+    --teleop.id=leader_arm \
+    --dataset.repo_id="my_username/pick_place_dataset" \
+    --dataset.num_episodes=100 \
+    --dataset.fps=30
 ```
 
-### 고급 수집 설정
+### 카메라를 포함한 데이터 수집
 
-```python
-from lerobot.common.robot_devices.control import DataCollector
-
-# 데이터 수집기 설정
-collector = DataCollector(
-    robot=robot,
-    cameras=[camera],
-    dataset=dataset,
-    use_haptic_feedback=True,  # 햅틱 피드백 사용
-    record_frequency=30,  # Hz
-)
-
-# 수집 시작
-print("데이터 수집을 시작합니다...")
-print("스페이스바: 에피소드 시작/종료")
-print("S: 성공 표시")
-print("F: 실패 표시")
-print("Q: 수집 종료")
-
-collector.start_collection()
+```bash
+# 카메라 2대를 사용한 데이터 수집
+python -m lerobot.record \
+    --robot.type=koch_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --robot.id=follower_arm \
+    --robot.cameras="{ 
+        top: {type: opencv, index_or_path: 0, width: 640, height: 480, fps: 30},
+        wrist: {type: opencv, index_or_path: 1, width: 640, height: 480, fps: 30}
+    }" \
+    --teleop.type=koch_leader \
+    --teleop.port=/dev/ttyUSB1 \
+    --teleop.id=leader_arm \
+    --dataset.repo_id="my_username/koch_manipulation" \
+    --dataset.num_episodes=50 \
+    --display_data=true
 ```
+
+<Callout type="info" title="데이터 수집 중 키보드 단축키">
+  - **스페이스바**: 에피소드 시작/종료
+  - **Enter**: 다음 에피소드로 진행
+  - **Ctrl+C**: 수집 종료 및 저장
+</Callout>
 
 ## 데이터 수집 전략
 
@@ -155,51 +149,53 @@ collector.start_collection()
 
 ### 2. 실패 데이터 포함
 
-```python
-# 에피소드 레이블링
-episode_labels = {
-    "success": True,  # 작업 성공
-    "failure_reason": None,  # 실패 이유
-    "difficulty": "medium",  # 난이도
-    "notes": "물체를 약간 비스듬히 잡음"
-}
+<Callout type="warning" title="실패 데이터의 중요성">
+  실패 사례도 학습에 중요합니다. 로봇이 어떤 행동을 피해야 하는지 학습할 수 있습니다.
+</Callout>
 
-collector.label_episode(episode_labels)
-```
+데이터 수집 중 다음과 같은 케이스를 포함하세요:
+- ✅ 완벽한 성공 케이스
+- ⚠️ 부분적 성공 (목표는 달성했지만 비효율적)
+- ❌ 실패 케이스 (물체를 떨어뜨림, 잘못된 위치 등)
 
 ### 3. 품질 관리
 
 <Tabs tabs={['수집 중 확인', '수집 후 검증']}>
   <div class="tab-panel">
-    ```python
-    # 실시간 데이터 품질 모니터링
-    collector.enable_quality_checks(
-        check_image_quality=True,
-        check_action_smoothness=True,
-        check_timing_consistency=True
-    )
+    실시간으로 데이터 품질을 확인하는 방법:
     
-    # 이상 데이터 자동 필터링
-    collector.set_outlier_detection(
-        joint_velocity_threshold=2.0,  # rad/s
-        acceleration_threshold=5.0  # rad/s²
-    )
+    ```bash
+    # display_data 옵션으로 실시간 시각화
+    python -m lerobot.record \
+        --robot.type=so101_follower \
+        --robot.port=/dev/ttyUSB0 \
+        --teleop.type=so101_leader \
+        --teleop.port=/dev/ttyUSB1 \
+        --dataset.repo_id="test_dataset" \
+        --display_data=true
     ```
+    
+    화면에서 확인할 항목:
+    - 카메라 이미지가 선명한지
+    - 로봇 움직임이 부드러운지
+    - 프레임 드롭이 없는지
   </div>
   <div class="tab-panel">
-    ```python
-    # 수집된 데이터 검증
-    from lerobot.common.datasets.utils import validate_dataset
+    수집 완료 후 데이터셋 검증:
     
-    validation_report = validate_dataset(
-        dataset_path="./data/my_dataset",
-        check_completeness=True,
-        check_consistency=True,
-        visualize_samples=True
-    )
+    ```bash
+    # 데이터셋 시각화 도구 실행
+    python -m lerobot.visualize \
+        --dataset.repo_id="my_username/my_dataset" \
+        --episode_index=0
     
-    print(f"유효한 에피소드: {validation_report['valid_episodes']}")
-    print(f"문제있는 에피소드: {validation_report['invalid_episodes']}")
+    # 여러 에피소드 확인
+    for i in {0..9}; do
+        python -m lerobot.visualize \
+            --dataset.repo_id="my_username/my_dataset" \
+            --episode_index=$i \
+            --save_video="episode_$i.mp4"
+    done
     ```
   </div>
 </Tabs>
@@ -208,99 +204,112 @@ collector.label_episode(episode_labels)
 
 ### 1. 배치 수집 계획
 
-```python
-# 수집 계획 수립
-collection_plan = {
-    "easy_tasks": {
-        "episodes": 30,
-        "description": "간단한 pick and place"
-    },
-    "medium_tasks": {
-        "episodes": 50,
-        "description": "장애물 회피 포함"
-    },
-    "hard_tasks": {
-        "episodes": 20,
-        "description": "정밀한 조작 필요"
-    }
-}
+체계적인 데이터 수집을 위한 스크립트 예시:
 
-# 진행 상황 추적
-for task_type, config in collection_plan.items():
-    print(f"\n{task_type} 수집 중...")
-    collect_task_data(config)
+```bash
+#!/bin/bash
+# collect_batch.sh - 배치 데이터 수집 스크립트
+
+# 쉬운 작업 (30 에피소드)
+echo "=== Easy Tasks: Simple Pick and Place ==="
+python -m lerobot.record \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyUSB1 \
+    --dataset.repo_id="my_username/easy_pick_place" \
+    --dataset.num_episodes=30
+
+# 중간 작업 (50 에피소드)
+echo "=== Medium Tasks: With Obstacles ==="
+python -m lerobot.record \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyUSB1 \
+    --dataset.repo_id="my_username/medium_pick_place" \
+    --dataset.num_episodes=50
+
+# 어려운 작업 (20 에피소드)
+echo "=== Hard Tasks: Precise Manipulation ==="
+python -m lerobot.record \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyUSB1 \
+    --dataset.repo_id="my_username/hard_pick_place" \
+    --dataset.num_episodes=20
 ```
 
-### 2. 휴먼 인 더 루프
+### 2. 효율적인 수집 전략
 
-<Callout type="tip" title="인간 개입 활용">
-  어려운 작업은 인간이 직접 시연하고, 쉬운 작업은 자동화하여 효율성을 높이세요.
+<Callout type="tip" title="수집 효율 높이기">
+  - **쉬운 작업부터 시작**: 로봇 조작에 익숙해진 후 복잡한 작업으로 진행
+  - **휴식 시간 확보**: 30분마다 5분 휴식으로 일관된 품질 유지
+  - **다양한 시간대**: 조명 조건이 다른 시간대에 수집하여 강건성 확보
 </Callout>
 
-```python
-# 하이브리드 데이터 수집
-collector = DataCollector(
-    robot=robot,
-    mode="hybrid",
-    human_intervention_threshold=0.8  # 80% 확신도 이하시 인간 개입
-)
-```
+### 3. 데이터 증강 고려사항
 
-### 3. 데이터 증강
-
-```python
-# 온라인 데이터 증강
-augmentation_config = {
-    "color_jitter": 0.1,
-    "brightness": 0.2,
-    "add_noise": 0.05,
-    "random_crop": True
-}
-
-collector.enable_augmentation(augmentation_config)
-```
+수집 단계에서 자연스러운 다양성 확보:
+- 📐 **시작 위치 변화**: 매 에피소드마다 약간씩 다른 위치에서 시작
+- 🎨 **물체 다양성**: 색상, 크기, 재질이 다른 물체 사용
+- 💡 **환경 변화**: 배경이나 조명을 점진적으로 변경
 
 ## 데이터셋 관리
 
-### 업로드 및 공유
+### HuggingFace Hub에 업로드
 
-```python
-# HuggingFace Hub에 업로드
-dataset.push_to_hub(
-    repo_id="my_org/my_robot_dataset",
-    private=False,  # 공개 데이터셋
-    commit_message="Initial dataset upload"
-)
+수집한 데이터셋을 공유하려면:
+
+```bash
+# HuggingFace CLI 로그인
+huggingface-cli login
+
+# 데이터셋 업로드
+python -m lerobot.push_dataset \
+    --dataset.repo_id="my_username/my_robot_dataset" \
+    --dataset.local_dir="./data/my_dataset" \
+    --private=false
 ```
 
-### 데이터셋 병합
+### 데이터셋 다운로드 및 병합
 
-```python
-# 여러 데이터셋 병합
-from lerobot.common.datasets.utils import merge_datasets
+```bash
+# 기존 데이터셋 다운로드
+python -m lerobot.download_dataset \
+    --dataset.repo_id="lerobot/pusht" \
+    --local_dir="./data/pusht"
 
-merged_dataset = merge_datasets(
-    dataset_paths=[
-        "./data/dataset1",
-        "./data/dataset2",
-        "./data/dataset3"
-    ],
-    output_path="./data/merged_dataset"
-)
+# 여러 데이터셋 병합 (스크립트 예시)
+python -c "
+from lerobot.common.datasets.lerobot_dataset import LeRobotDataset
+
+# 데이터셋 로드
+ds1 = LeRobotDataset('user/dataset1')
+ds2 = LeRobotDataset('user/dataset2')
+
+# 병합 후 저장
+merged = ds1.merge(ds2)
+merged.push_to_hub('user/merged_dataset')
+"
 ```
 
-### 데이터 시각화
+### 데이터셋 시각화 및 검토
 
-```python
-# 수집된 데이터 시각화
-from lerobot.common.datasets.visualization import visualize_episodes
+```bash
+# 웹 인터페이스로 데이터셋 탐색
+python -m lerobot.serve_dataset \
+    --dataset.repo_id="my_username/my_dataset" \
+    --port=8080
 
-visualize_episodes(
-    dataset=dataset,
-    episode_indices=[0, 10, 20],  # 시각화할 에피소드
-    save_path="./visualizations",
-    create_video=True
-)
+# 브라우저에서 http://localhost:8080 접속
+
+# 특정 에피소드를 비디오로 저장
+python -m lerobot.visualize \
+    --dataset.repo_id="my_username/my_dataset" \
+    --episode_index=0 \
+    --save_video="episode_0_review.mp4"
 ```
 
 ## 문제 해결
