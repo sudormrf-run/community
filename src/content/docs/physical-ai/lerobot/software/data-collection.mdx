@@ -12,23 +12,32 @@ import Tabs from '../../../../../components/Tabs.astro';
 
 ### 데이터셋 예시
 
-아래는 LeRobot으로 수집된 실제 체스 로봇 데이터셋의 예시입니다. 1500개의 체스 움직임을 학습한 ACT 모델의 데이터를 시각화한 것입니다:
+LeRobot으로 수집된 실제 데이터셋을 확인해보세요:
 
-<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 2rem 0;">
-  <iframe 
-    src="https://huggingface.co/spaces/lerobot/visualize_dataset/embed?path=%2Fdopaul%2Feval_1500_chess_moves_act_240k%2Fepisode_0" 
-    title="LeRobot 체스 데이터셋 시각화"
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: var(--radius-lg);"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    allowfullscreen
-  ></iframe>
+<div style="background: var(--color-surface); border: 2px solid var(--color-accent); border-radius: var(--radius-lg); padding: 1.5rem; margin: 2rem 0;">
+  <h4 style="margin: 0 0 1rem 0; color: var(--color-accent);">
+    <i class="fas fa-chess"></i> 체스 로봇 데이터셋 시각화
+  </h4>
+  <p style="margin-bottom: 1rem;">
+    1500개의 체스 움직임을 학습한 ACT 모델의 데이터셋입니다. 
+    로봇의 관절 상태, 카메라 이미지, 액션 시퀀스를 확인할 수 있습니다.
+  </p>
+  <a 
+    href="https://huggingface.co/spaces/lerobot/visualize_dataset?path=%2Fdopaul%2Feval_1500_chess_moves_act_240k%2Fepisode_0" 
+    target="_blank"
+    style="display: inline-block; padding: 0.75rem 1.5rem; background: var(--color-accent); color: var(--color-bg); text-decoration: none; border-radius: var(--radius-md); font-weight: 600; transition: all var(--transition-base);"
+    onmouseover="this.style.opacity='0.9'"
+    onmouseout="this.style.opacity='1'"
+  >
+    <i class="fas fa-external-link-alt"></i> HuggingFace에서 데이터셋 탐색하기
+  </a>
 </div>
 
 ## 데이터 수집 개요
 
 LeRobot에서 데이터 수집은 다음 요소로 구성됩니다:
 
-1. **로봇 상태**: 관절 각도, 속도, 토크
+1. **로봇 상태**: 관절 각도
 2. **시각 정보**: RGB 카메라 이미지
 3. **행동 정보**: 제어 명령과 타이밍
 4. **메타데이터**: 작업 정보, 성공/실패 여부
