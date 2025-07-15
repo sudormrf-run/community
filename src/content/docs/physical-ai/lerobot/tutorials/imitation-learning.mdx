@@ -1,208 +1,135 @@
 ---
-title: 'SO-101로 Imitation Learning'
-description: 'SO-101 로봇 팔을 사용한 모방 학습(Imitation Learning) 실습 가이드'
+title: 'Imitation Learning 실전 가이드'
+description: 'LeRobot으로 모방 학습(Imitation Learning) 실습하기'
 ---
 
 import Callout from '../../../../../components/Callout.astro';
-import Tabs from '../../../../../components/Tabs.astro';
 
-# SO-101로 Imitation Learning
+# Imitation Learning 실전 가이드
 
-이 튜토리얼에서는 LeRobot을 사용하여 실제 로봇에 모방 학습(Imitation Learning)을 적용하는 방법을 알아봅니다.
+모방 학습(Imitation Learning)은 인간의 시연을 관찰하여 로봇이 작업을 학습하는 방법입니다. 이 가이드는 LeRobot을 사용한 전체 워크플로우를 단계별로 안내합니다.
 
-<Callout type="info" title="모방 학습이란?">
-  모방 학습은 인간의 시연을 관찰하고 학습하여 로봇이 동일한 작업을 수행할 수 있도록 훈련하는 방법입니다. 
-  로봇이 물체를 집거나, 조작하는 등의 복잡한 작업을 학습할 수 있습니다.
+<Callout type="tip" title="시작하기 전에">
+  이 튜토리얼은 LeRobot이 설치되어 있고 하드웨어가 준비되었다고 가정합니다.
+  아직 준비가 안 되었다면 [설치 가이드](/community/docs/physical-ai/lerobot/software/installation)를 먼저 확인하세요.
 </Callout>
 
-## 📋 준비물
+## 🚀 전체 워크플로우
 
-### 필수 하드웨어
-- **로봇 팔**: SO-100, SO-101, Koch v1.1 등 LeRobot 지원 하드웨어
-- **원격 조작 장치**: 리더 암(leader arm) 또는 키보드
-- **카메라**: 시각적 입력을 위한 웹캠 (선택사항이지만 권장)
+1. **로봇 캘리브레이션** → 2. **Teleoperation 설정** → 3. **데이터 수집** → 4. **데이터셋 시각화** → 5. **모델 학습** → 6. **평가 및 배포**
 
-### 소프트웨어 요구사항
-- Python 3.8+
-- PyTorch (CUDA 지원 권장)
-- LeRobot 라이브러리
+## 1️⃣ 로봇 설정 및 캘리브레이션
 
-## 🚀 시작하기
+로봇 하드웨어 설정과 캘리브레이션은 각 하드웨어별 가이드를 참조하세요:
 
-### 1단계: 하드웨어 설정 및 캘리브레이션
+- [SO-ARM101 설정](/community/docs/physical-ai/lerobot/hardware/so-101)
+- [Koch v1.1 설정](/community/docs/physical-ai/lerobot/hardware/koch)
 
-먼저 로봇과 원격 조작 장치를 연결하고 캘리브레이션을 수행합니다.
+## 2️⃣ Teleoperation 설정
 
+원격 조작 설정은 [Teleoperation 가이드](/community/docs/physical-ai/lerobot/software/teleoperation)에서 자세히 다룹니다.
+
+간단한 예시:
 ```bash
-# 로봇 연결 확인
-python -m lerobot.scripts.find_devices
-
-# 캘리브레이션 실행
-python -m lerobot.scripts.calibrate \
-  --robot-type so101 \
-  --robot-device /dev/ttyUSB0
+python -m lerobot.teleoperate \
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0
 ```
 
-<Callout type="warning" title="디바이스 연결 주의">
-  USB 디바이스의 경로는 시스템마다 다를 수 있습니다. `ls /dev/ttyUSB*` 명령으로 확인하세요.
+## 3️⃣ 데이터 수집
+
+효과적인 데이터 수집 방법은 [데이터 수집 가이드](/community/docs/physical-ai/lerobot/software/data-collection)를 참조하세요.
+
+### 빠른 시작 명령
+```bash
+python -m lerobot.record \
+    --dataset.repo_id=${HF_USER}/my_first_dataset \
+    --dataset.num_episodes=50 \
+    --robot.type=so101
+```
+
+<Callout type="info" title="데이터 수집 팁">
+  - 최소 50개 에피소드 수집 (위치당 10개씩)
+  - 카메라 위치 고정 유지
+  - 물체가 카메라 뷰에 잘 보이도록 설정
+  - 간단한 작업부터 시작
 </Callout>
 
-### 2단계: 데이터 수집
+## 4️⃣ 데이터셋 시각화
 
-이제 로봇을 원격 조작하여 작업을 시연하고 데이터를 수집합니다.
-
-#### 녹화 시작
+수집한 데이터를 확인하려면:
 
 ```bash
-python -m lerobot.scripts.record \
-  --robot-type so101 \
-  --fps 30 \
-  --repo-id ${HF_USER}/my_robot_dataset \
-  --tags tutorial pick_place \
-  --warmup-time-s 5 \
-  --episode-time-s 30 \
-  --reset-time-s 10
+# 로컬 시각화 서버 실행
+python -m lerobot.serve_dataset \
+    --dataset.repo_id=${HF_USER}/my_first_dataset \
+    --port=8080
 ```
 
-#### 데이터 수집 팁
+또는 [HuggingFace 데이터 시각화 도구](https://huggingface.co/spaces/lerobot/visualize_dataset)를 사용하세요.
 
-<div style="background: var(--color-surface); padding: 1.5rem; border-radius: var(--radius-lg); margin: 1rem 0;">
-  <h4 style="margin-top: 0;">📸 효과적인 데이터 수집을 위한 권장사항</h4>
-  
-  - **최소 50개 이상의 에피소드 녹화**: 모델이 일반화할 수 있도록 충분한 데이터 필요
-  - **일관된 카메라 위치 유지**: 모든 녹화에서 동일한 시점 사용
-  - **작업별 10개 에피소드**: 각 위치나 조건에서 최소 10회 시연
-  - **점진적 난이도 증가**: 간단한 작업부터 시작하여 복잡도 증가
-</div>
+## 5️⃣ 모델 학습
 
-### 3단계: 정책 훈련
+모델 학습에 대한 자세한 내용은 [학습 가이드](/community/docs/physical-ai/lerobot/software/training)를 참조하세요.
 
-수집한 데이터로 신경망 모델을 훈련합니다.
+### ACT 모델 학습 예시
+```bash
+python -m lerobot.scripts.train \
+    --dataset.repo_id=${HF_USER}/my_first_dataset \
+    --policy.type=act \
+    --output_dir=outputs/my_first_model
+```
 
-<Tabs tabs={['로컬 GPU', '클라우드 (Colab)', 'CPU (비권장)']}>
-  <div class="tab-panel">
-    ```bash
-    python -m lerobot.scripts.train \
-      --dataset.repo_id=${HF_USER}/my_robot_dataset \
-      --policy.type=act \
-      --output_dir=outputs/train/act_my_robot \
-      --policy.device=cuda \
-      --wandb.enable=true \
-      --training.num_epochs=100
-    ```
-  </div>
-  <div class="tab-panel">
-    ```python
-    # Google Colab에서 실행
-    !pip install lerobot
-    
-    # GPU 런타임 선택 후
-    !python -m lerobot.scripts.train \
-      --dataset.repo_id=${HF_USER}/my_robot_dataset \
-      --policy.type=act \
-      --output_dir=/content/outputs/train \
-      --policy.device=cuda \
-      --training.batch_size=8
-    ```
-  </div>
-  <div class="tab-panel">
-    ```bash
-    # CPU에서는 훈련이 매우 느림
-    python -m lerobot.scripts.train \
-      --dataset.repo_id=${HF_USER}/my_robot_dataset \
-      --policy.type=act \
-      --output_dir=outputs/train/act_cpu \
-      --policy.device=cpu \
-      --training.batch_size=4 \
-      --training.num_epochs=10
-    ```
-  </div>
-</Tabs>
+## 6️⃣ 평가 및 실행
 
-### 4단계: 평가 및 실행
-
-훈련된 모델을 로봇에서 실행하여 성능을 평가합니다.
+학습된 모델로 로봇 제어:
 
 ```bash
-# 훈련된 정책으로 로봇 제어
 python -m lerobot.scripts.eval \
-  --robot-type so101 \
-  --policy-checkpoint outputs/train/act_my_robot/checkpoint_100.pth \
-  --fps 30 \
-  --episode-time-s 30
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --policy.path=outputs/my_first_model/checkpoint_last.pt \
+    --dataset.num_episodes=10
 ```
 
-## 🎯 실전 예제: 물체 집기 작업
+## 🎯 실전 프로젝트: 블록 쌓기
 
-### 작업 설정
-1. 테이블 위에 작은 물체(블록, 컵 등) 배치
-2. 로봇이 물체를 집어 다른 위치로 이동
-3. 다양한 시작 위치에서 반복
+### 단계별 진행
 
-### 데이터 수집 프로토콜
-```bash
-# 5개의 다른 위치에서 각각 10회 시연
-for position in {1..5}; do
-  echo "Position $position - 10 episodes"
-  python -m lerobot.scripts.record \
-    --tags pick_place position_${position} \
-    --num-episodes 10
-done
-```
+1. **환경 준비**
+   - 테이블에 3개의 블록 배치
+   - 카메라가 전체 작업 공간을 볼 수 있도록 설정
 
-## 🔧 문제 해결
+2. **데이터 수집**
+   ```bash
+   # 블록 쌓기 작업 50회 시연
+   python -m lerobot.record \
+       --dataset.repo_id=${HF_USER}/block_stacking \
+       --dataset.num_episodes=50 \
+       --dataset.single_task="Stack 3 blocks"
+   ```
 
-### 일반적인 문제와 해결방법
+3. **모델 학습**
+   ```bash
+   python -m lerobot.scripts.train \
+       --dataset.repo_id=${HF_USER}/block_stacking \
+       --policy.type=act \
+       --wandb.enable=true
+   ```
 
-<Callout type="warning" title="낮은 성공률">
-  **문제**: 로봇이 작업을 제대로 수행하지 못함
-  
-  **해결책**:
-  - 더 많은 데이터 수집 (100+ 에피소드)
-  - 시연의 일관성 향상
-  - 카메라 위치 재조정
-</Callout>
+## 📚 추가 리소스
 
-<Callout type="danger" title="하드웨어 연결 오류">
-  **문제**: 로봇이 인식되지 않음
-  
-  **해결책**:
-  - USB 권한 확인: `sudo chmod 666 /dev/ttyUSB*`
-  - 드라이버 재설치
-  - 케이블 교체
-</Callout>
+- **정책 모델 선택**: [ACT](/community/docs/physical-ai/lerobot/policy/act) vs [SmolVLA](/community/docs/physical-ai/lerobot/policy/smolvla)
+- **고급 기능**: 멀티태스크 학습, 강화학습 통합
+- **커뮤니티**: [Discord](https://discord.com/invite/s3KuuzsPFb), [카카오톡 오픈채팅](https://open.kakao.com/o/gS5OQJth)
 
-## 📊 성능 모니터링
-
-Weights & Biases를 사용하여 훈련 과정을 모니터링할 수 있습니다:
-
-```bash
-# W&B 로그인
-wandb login
-
-# 훈련 시작 (자동으로 로깅됨)
-python -m lerobot.scripts.train --wandb.enable=true
-```
-
-## 🎓 다음 단계
-
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0;">
-  <a href="/community/docs/physical-ai/lerobot/advanced" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none;">
-    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);">고급 기법</h3>
-    <p style="margin: 0; color: var(--color-text-secondary);">강화학습, 멀티태스크 학습 등</p>
-  </a>
-  
-  <a href="https://huggingface.co/lerobot" style="padding: 1.5rem; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); text-decoration: none;">
-    <h3 style="margin: 0 0 0.5rem 0; color: var(--color-accent);">모델 허브</h3>
-    <p style="margin: 0; color: var(--color-text-secondary);">사전 훈련된 모델 탐색</p>
-  </a>
-</div>
-
-<Callout type="success" title="축하합니다! 🎉">
-  첫 번째 모방 학습 로봇을 성공적으로 훈련했습니다. 
-  이제 더 복잡한 작업에 도전하거나, 다양한 정책 아키텍처를 실험해보세요!
+<Callout type="success" title="다음 단계">
+  기본 작업을 마스터했다면 더 복잡한 작업에 도전해보세요:
+  - 다양한 물체 조작
+  - 멀티태스크 학습
+  - 비전-언어 모델 활용
 </Callout>
 
 ---
 
-*이 튜토리얼은 [HuggingFace LeRobot 공식 문서](https://huggingface.co/docs/lerobot)를 참고하여 작성되었습니다.*
+*더 자세한 내용은 [HuggingFace LeRobot 공식 문서](https://huggingface.co/docs/lerobot/main/en/il_robots)를 참조하세요.*
