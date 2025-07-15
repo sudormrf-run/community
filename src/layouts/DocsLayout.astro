@@ -112,7 +112,7 @@ const navigation = [
                     <li>
                       {item.items ? (
                         <>
-                          <span class={`nav-group-title ${item.items.some(subItem => currentPath === subItem.href) ? 'active' : ''}`}>
+                          <span class="nav-group-title">
                             <i class="fas fa-folder"></i>
                             {item.title}
                           </span>
@@ -332,12 +332,9 @@ const navigation = [
     color: #ccc;
     text-decoration: none;
     display: block;
-    padding: 0.5rem 0.75rem;
+    padding: 0.375rem 0.75rem;
     border-radius: 0.25rem;
     transition: all 0.2s;
-    border-left: 4px solid transparent;
-    margin-left: -4px;
-    position: relative;
   }
 
   .nav-section a:hover {
@@ -347,34 +344,8 @@ const navigation = [
 
   .nav-section a.active {
     color: var(--color-orange);
-    background: rgba(253, 115, 24, 0.15);
-    border-left: 4px solid var(--color-orange);
-    font-weight: 600;
-    box-shadow: 0 0 20px rgba(253, 115, 24, 0.2);
-    transform: translateX(4px);
-  }
-  
-  .nav-section a.active::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 60%;
-    background: var(--color-orange);
-    border-radius: 2px;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-  }
-  
-  .nav-section a.active i {
-    color: var(--color-orange);
-    transform: scale(1.1);
+    background: rgba(253, 115, 24, 0.1);
+    border-left: 3px solid var(--color-orange);
   }
   
   .external-indicator {
@@ -387,24 +358,10 @@ const navigation = [
     padding: 0.375rem 0.75rem;
     color: var(--text-color);
     font-weight: 600;
-    transition: all 0.2s ease;
-  }
-  
-  .nav-group-title.active {
-    color: var(--color-orange);
-  }
-  
-  .nav-group-title.active i {
-    color: var(--color-orange);
   }
 
   .nav-group {
     margin-left: 1rem;
-  }
-  
-  /* 현재 선택된 항목이 있는 그룹은 항상 펼쳐짐 */
-  .nav-group-title.active + .nav-group {
-    display: block !important;
   }
 
   /* 메인 콘텐츠 */
