@@ -1,135 +1,219 @@
 ---
-title: 'Imitation Learning 실전 가이드'
-description: 'LeRobot으로 모방 학습(Imitation Learning) 실습하기'
+title: 'SO-ARM101 Pick & Place 튜토리얼'
+description: 'SO-ARM101과 ACT로 물체 집어 담기 작업 학습하기'
 ---
 
 import Callout from '../../../../../components/Callout.astro';
 
-# Imitation Learning 실전 가이드
+# SO-ARM101 Pick & Place 튜토리얼
 
-모방 학습(Imitation Learning)은 인간의 시연을 관찰하여 로봇이 작업을 학습하는 방법입니다. 이 가이드는 LeRobot을 사용한 전체 워크플로우를 단계별로 안내합니다.
+이 튜토리얼에서는 SO-ARM101 로봇과 ACT(Action Chunking with Transformers) 모델을 사용하여 물체를 집어서 바구니에 담는 작업을 학습시키는 전체 과정을 다룹니다.
 
-<Callout type="tip" title="시작하기 전에">
-  이 튜토리얼은 LeRobot이 설치되어 있고 하드웨어가 준비되었다고 가정합니다.
-  아직 준비가 안 되었다면 [설치 가이드](/community/docs/physical-ai/lerobot/software/installation)를 먼저 확인하세요.
+<Callout type="info" title="필요 사항">
+  - **하드웨어**: SO-ARM101 (리더+팔로워)
+  - **카메라**: USB 웹캠 1대
+  - **작업 물체**: 작은 블록 또는 장난감
+  - **목표 바구니**: 투명한 플라스틱 통
 </Callout>
 
-## 🚀 전체 워크플로우
+## 🎯 작업 목표
 
-1. **로봇 캘리브레이션** → 2. **Teleoperation 설정** → 3. **데이터 수집** → 4. **데이터셋 시각화** → 5. **모델 학습** → 6. **평가 및 배포**
+로봇이 테이블 위의 물체를 집어서 바구니에 담는 작업을 자율적으로 수행하도록 학습시킵니다.
 
-## 1️⃣ 로봇 설정 및 캘리브레이션
+## 1️⃣ 환경 설정
 
-로봇 하드웨어 설정과 캘리브레이션은 각 하드웨어별 가이드를 참조하세요:
+### 작업 공간 준비
+```
+┌─────────────────────────┐
+│                         │
+│     [카메라]            │
+│        ↓                │
+│   ┌─────────┐          │
+│   │ 바구니  │          │
+│   └─────────┘          │
+│                         │
+│  [물체]    [SO-ARM101]  │
+│                         │
+└─────────────────────────┘
+```
 
-- [SO-ARM101 설정](/community/docs/physical-ai/lerobot/hardware/so-101)
-- [Koch v1.1 설정](/community/docs/physical-ai/lerobot/hardware/koch)
+<Callout type="tip" title="설정 팁">
+  - 카메라는 작업 공간 전체가 보이도록 45도 각도로 설치
+  - 바구니는 투명한 것을 사용하여 물체가 들어간 것을 확인 가능하게
+  - 조명은 그림자가 적게 생기도록 균일하게
+</Callout>
 
-## 2️⃣ Teleoperation 설정
-
-원격 조작 설정은 [Teleoperation 가이드](/community/docs/physical-ai/lerobot/software/teleoperation)에서 자세히 다룹니다.
-
-간단한 예시:
+### SO-ARM101 연결 및 테스트
 ```bash
+# 1. 디바이스 확인
+python -m lerobot.scripts.find_devices
+
+# 2. 리더-팔로워 연결 테스트
 python -m lerobot.teleoperate \
     --robot.type=so101_follower \
-    --robot.port=/dev/ttyUSB0
+    --robot.port=/dev/ttyUSB0 \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyUSB1
 ```
 
-## 3️⃣ 데이터 수집
+## 2️⃣ 데이터 수집
 
-효과적인 데이터 수집 방법은 [데이터 수집 가이드](/community/docs/physical-ai/lerobot/software/data-collection)를 참조하세요.
-
-### 빠른 시작 명령
+### 작업 시연 녹화
 ```bash
+# Pick & Place 데이터셋 생성
+export TASK_NAME="pick_and_place_basket"
+export HF_USER="your_username"
+
 python -m lerobot.record \
-    --dataset.repo_id=${HF_USER}/my_first_dataset \
-    --dataset.num_episodes=50 \
-    --robot.type=so101
+    --robot.type=so101_follower \
+    --robot.port=/dev/ttyUSB0 \
+    --teleop.type=so101_leader \
+    --teleop.port=/dev/ttyUSB1 \
+    --robot.cameras="webcam" \
+    --dataset.repo_id=${HF_USER}/${TASK_NAME} \
+    --dataset.single_task="Pick object and place in basket" \
+    --dataset.num_episodes=100 \
+    --warmup_time_s=3 \
+    --episode_time_s=15 \
+    --reset_time_s=5
 ```
 
-<Callout type="info" title="데이터 수집 팁">
-  - 최소 50개 에피소드 수집 (위치당 10개씩)
-  - 카메라 위치 고정 유지
-  - 물체가 카메라 뷰에 잘 보이도록 설정
-  - 간단한 작업부터 시작
+### 데이터 수집 프로토콜
+
+<Callout type="warning" title="중요한 시연 규칙">
+  1. **시작 위치**: 로봇 팔은 항상 홈 포지션에서 시작
+  2. **물체 위치**: 5개의 다른 위치에서 각 20회씩 시연
+  3. **속도**: 일정한 속도로 부드럽게 움직이기
+  4. **그립**: 물체를 확실하게 잡았는지 확인 후 이동
 </Callout>
 
-## 4️⃣ 데이터셋 시각화
+### 위치별 데이터 수집
+```bash
+# 5개 위치에서 각각 20 에피소드씩
+for i in {1..5}; do
+    echo "=== Position $i: 20 episodes ==="
+    echo "물체를 Position $i에 놓고 Enter를 누르세요..."
+    read
+    
+    python -m lerobot.record \
+        --dataset.repo_id=${HF_USER}/${TASK_NAME} \
+        --dataset.num_episodes=20 \
+        --dataset.tags="position_$i" \
+        --resume
+done
+```
 
-수집한 데이터를 확인하려면:
+## 3️⃣ 데이터 검증
 
 ```bash
-# 로컬 시각화 서버 실행
+# 수집한 데이터 시각화
 python -m lerobot.serve_dataset \
-    --dataset.repo_id=${HF_USER}/my_first_dataset \
+    --dataset.repo_id=${HF_USER}/${TASK_NAME} \
     --port=8080
+
+# 브라우저에서 http://localhost:8080 접속
 ```
 
-또는 [HuggingFace 데이터 시각화 도구](https://huggingface.co/spaces/lerobot/visualize_dataset)를 사용하세요.
+## 4️⃣ ACT 모델 학습
 
-## 5️⃣ 모델 학습
-
-모델 학습에 대한 자세한 내용은 [학습 가이드](/community/docs/physical-ai/lerobot/software/training)를 참조하세요.
-
-### ACT 모델 학습 예시
+### 학습 설정
 ```bash
+# ACT 모델 학습 시작
 python -m lerobot.scripts.train \
-    --dataset.repo_id=${HF_USER}/my_first_dataset \
+    --dataset.repo_id=${HF_USER}/${TASK_NAME} \
     --policy.type=act \
-    --output_dir=outputs/my_first_model
+    --output_dir=outputs/act_${TASK_NAME} \
+    --policy.device=cuda \
+    --training.num_epochs=500 \
+    --training.batch_size=32 \
+    --training.learning_rate=1e-4 \
+    --wandb.enable=true \
+    --wandb.project="so101_pick_place"
 ```
 
-## 6️⃣ 평가 및 실행
+### 학습 모니터링
+```python
+# 학습 중 W&B에서 실시간으로 확인할 수 있는 메트릭:
+# - loss/total: 전체 손실
+# - loss/action: 액션 예측 손실
+# - validation/success_rate: 검증 성공률
+```
 
-학습된 모델로 로봇 제어:
+## 5️⃣ 모델 평가 및 실행
 
+### 실시간 평가
 ```bash
+# 학습된 모델로 실제 작업 수행
 python -m lerobot.scripts.eval \
     --robot.type=so101_follower \
     --robot.port=/dev/ttyUSB0 \
-    --policy.path=outputs/my_first_model/checkpoint_last.pt \
-    --dataset.num_episodes=10
+    --robot.cameras="webcam" \
+    --policy.path=outputs/act_${TASK_NAME}/checkpoint_best.pt \
+    --dataset.num_episodes=20 \
+    --dataset.repo_id=${HF_USER}/${TASK_NAME}_eval
 ```
 
-## 🎯 실전 프로젝트: 블록 쌓기
+### 성공률 측정
+```bash
+# 20회 테스트 후 성공률 자동 계산
+# 성공 기준: 물체가 바구니 안에 들어감
+```
 
-### 단계별 진행
+## 6️⃣ 문제 해결 및 최적화
 
-1. **환경 준비**
-   - 테이블에 3개의 블록 배치
-   - 카메라가 전체 작업 공간을 볼 수 있도록 설정
+### 일반적인 문제와 해결책
 
-2. **데이터 수집**
-   ```bash
-   # 블록 쌓기 작업 50회 시연
-   python -m lerobot.record \
-       --dataset.repo_id=${HF_USER}/block_stacking \
-       --dataset.num_episodes=50 \
-       --dataset.single_task="Stack 3 blocks"
-   ```
+<Callout type="warning" title="낮은 성공률 (<70%)">
+  **원인**: 데이터 부족 또는 일관성 부족
+  
+  **해결책**:
+  - 실패한 위치에서 추가 20개 데이터 수집
+  - 속도를 더 일정하게 유지
+  - 그립 강도 조정
+</Callout>
 
-3. **모델 학습**
-   ```bash
-   python -m lerobot.scripts.train \
-       --dataset.repo_id=${HF_USER}/block_stacking \
-       --policy.type=act \
-       --wandb.enable=true
-   ```
+<Callout type="danger" title="물체를 놓치는 경우">
+  **원인**: 그립 타이밍 문제
+  
+  **해결책**:
+  ```bash
+  # 그립 지속 시간 증가
+  python -m lerobot.scripts.train \
+      --policy.action_chunk_size=50 \
+      --resume
+  ```
+</Callout>
 
-## 📚 추가 리소스
+## 🎉 결과 공유
 
-- **정책 모델 선택**: [ACT](/community/docs/physical-ai/lerobot/policy/act) vs [SmolVLA](/community/docs/physical-ai/lerobot/policy/smolvla)
-- **고급 기능**: 멀티태스크 학습, 강화학습 통합
-- **커뮤니티**: [Discord](https://discord.com/invite/s3KuuzsPFb), [카카오톡 오픈채팅](https://open.kakao.com/o/gS5OQJth)
+```bash
+# HuggingFace에 모델 업로드
+huggingface-cli upload ${HF_USER}/act_so101_pick_place \
+    outputs/act_${TASK_NAME}/checkpoint_best.pt
 
-<Callout type="success" title="다음 단계">
-  기본 작업을 마스터했다면 더 복잡한 작업에 도전해보세요:
-  - 다양한 물체 조작
-  - 멀티태스크 학습
-  - 비전-언어 모델 활용
+# 데모 비디오 생성
+python -m lerobot.scripts.create_demo_video \
+    --policy.path=outputs/act_${TASK_NAME}/checkpoint_best.pt \
+    --output=demo_pick_place.mp4
+```
+
+## 📊 기대 성능
+
+| 지표 | 목표값 | 일반적 달성값 |
+|-----|-------|------------|
+| 성공률 | >90% | 85-95% |
+| 평균 수행 시간 | <10초 | 8-12초 |
+| 필요 데이터 | 100 에피소드 | 80-120 |
+
+<Callout type="success" title="축하합니다!">
+  SO-ARM101으로 첫 번째 Pick & Place 작업을 성공적으로 학습시켰습니다!
+  
+  **다음 도전 과제**:
+  - 다양한 물체 종류로 확장
+  - 여러 개의 바구니 구분하기
+  - 색상별 분류 작업
 </Callout>
 
 ---
 
-*더 자세한 내용은 [HuggingFace LeRobot 공식 문서](https://huggingface.co/docs/lerobot/main/en/il_robots)를 참조하세요.*
+*이 튜토리얼의 전체 코드와 데이터셋은 [HuggingFace Hub](https://huggingface.co/lerobot)에서 확인할 수 있습니다.*
