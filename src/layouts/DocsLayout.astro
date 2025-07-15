@@ -9,6 +9,14 @@ export interface Props {
 const { title, description = 'Sudoremove Community - AI의 문턱을 낮추다' } = Astro.props;
 const currentPath = Astro.url.pathname;
 
+// 트레일링 슬래시 처리를 위한 헬퍼 함수
+const isActivePath = (href: string, current: string) => {
+  // 트레일링 슬래시 제거
+  const normalizedHref = href.endsWith('/') ? href.slice(0, -1) : href;
+  const normalizedCurrent = current.endsWith('/') ? current.slice(0, -1) : current;
+  return normalizedHref === normalizedCurrent;
+};
+
 // 네비게이션 구조
 const navigation = [
   {
@@ -121,7 +129,7 @@ const navigation = [
                               <li>
                                 <a 
                                   href={subItem.href} 
-                                  class={currentPath === subItem.href ? 'active' : ''}
+                                  class={isActivePath(subItem.href, currentPath) ? 'active' : ''}
                                 >
                                   <i class="fas fa-file-alt"></i>
                                   {subItem.title}
@@ -133,7 +141,7 @@ const navigation = [
                       ) : (
                         <a 
                           href={item.href}
-                          class={currentPath === item.href ? 'active' : ''}
+                          class={isActivePath(item.href, currentPath) ? 'active' : ''}
                           target={item.external ? '_blank' : undefined}
                           rel={item.external ? 'noopener noreferrer' : undefined}
                         >
@@ -343,11 +351,27 @@ const navigation = [
   }
 
   .nav-section a.active {
-    color: var(--color-orange);
-    background: rgba(253, 115, 24, 0.2);
-    border-left: 3px solid var(--color-orange);
-    padding-left: calc(0.75rem - 3px);
+    color: #fff !important;
+    background: rgba(253, 115, 24, 0.25) !important;
+    border-left: 4px solid var(--color-orange);
+    padding-left: calc(0.75rem - 4px);
     font-weight: 600;
+    position: relative;
+  }
+  
+  .nav-section a.active i {
+    color: var(--color-orange);
+  }
+  
+  .nav-section a.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, rgba(253, 115, 24, 0.3) 0%, transparent 100%);
+    pointer-events: none;
   }
   
   .external-indicator {
