@@ -13,30 +13,27 @@ ACT는 복잡한 로봇 조작 작업을 위한 혁신적인 모방 학습 알�
 <Callout type="tip" title="ACT의 특징">
   - **Action Chunking**: 단일 액션이 아닌 액션 시퀀스 예측
   - **Temporal Ensembling**: 부드러운 동작을 위한 시간적 앙상블
-  - **CVAE 아키텍처**: 인간 시연의 다양성 모델링
-  - **빠른 학습**: RTX 2080 Ti에서 5시간 내 학습 완료
+  - **빠른 학습**: RTX 3090에서 5시간 내 학습 완료
+  - **SO-ARM101 성공 사례 다수**: 저가의 하드웨어에서도 간단한 작업이 완수된 사례가 많음
+</Callout>
+
+<Callout type="info" title="필자 의견">
+  **ACT 모델을 사용해본 개인적인 경험을 공유합니다:**
+  
+  - Pre-Trained 모델이 아니라 바닥부터 학습해서 보통 사용합니다.
+  - 아주 작고 효율적이라서 간단한 Task를 학습하고 구동할 수 있습니다.
+  - 꽤 잘 되는데... **Overfit이 심합니다**. 조명이나 물체 등 환경이 변하면 안 되는 경우가 많습니다.
+  - 그래도 처음 시작하기엔 아주 좋은 모델입니다! 👍
 </Callout>
 
 ## 개요
 
 ACT는 Stanford에서 개발한 알고리즘으로, 다음과 같은 핵심 혁신을 통해 정밀한 로봇 조작을 가능하게 합니다:
 
-1. **Action Chunking**: 한 번에 k개의 액션을 예측하여 누적 오류 감소
-2. **Temporal Ensembling**: 매 타임스텝마다 정책을 쿼리하고 가중 평균
-3. **조건부 VAE**: 인간 시연의 확률적 변동성 모델링
-
 ## 핵심 개념
 
 ### Action Chunking
 전통적인 방법이 한 번에 하나의 액션만 예측하는 것과 달리, ACT는 미래의 k개 액션을 한 번에 예측합니다.
-
-```python
-# 기존 방식: 단일 액션 예측
-action = policy(observation)
-
-# ACT: 액션 시퀀스 예측
-action_sequence = policy(observation)  # [a[t], a[t+1], ..., a[t+k-1]]
-```
 
 ### Temporal Ensembling
 부드러운 로봇 동작을 위해 겹치는 액션 청크들을 가중 평균합니다.
@@ -52,14 +49,8 @@ action_sequence = policy(observation)  # [a[t], a[t+1], ..., a[t+k-1]]
 
 ## 사용 방법
 
-### 1. 설치
 
-```bash
-# ACT는 LeRobot에 기본 포함
-uv pip install -e ".[act]"
-```
-
-### 2. 데이터셋 준비
+### 1. 데이터셋 준비
 
 ```bash
 # 로봇 시연 데이터 수집
@@ -71,12 +62,12 @@ python -m lerobot.record \
 ```
 
 <Callout type="tip" title="데이터 수집 팁">
-  - 최소 50개 에피소드 (10분 분량)
+  - 최소 50개 에피소드 (10분 분량, 에피소드 길이마다 다를 수 있음)
   - 다양한 시작 위치에서 시연
   - 일관된 속도로 부드럽게 동작
 </Callout>
 
-### 3. 학습
+### 2. 학습
 
 <Tabs tabs={['기본 학습', '고급 설정']}>
   <div class="tab-panel">
@@ -110,7 +101,7 @@ python -m lerobot.record \
   </div>
 </Tabs>
 
-### 4. 추론 및 실행
+### 3. 추론 및 실행
 
 ```bash
 # 학습된 정책으로 로봇 제어
@@ -122,39 +113,6 @@ python -m lerobot.scripts.eval \
     --dataset.num_episodes=20
 ```
 
-## 모델 아키텍처
-
-### CVAE 구조
-ACT는 Conditional Variational Autoencoder (CVAE) 구조를 사용합니다:
-- **입력**: 관측값 (이미지 + 로봇 상태)
-- **인코더**: 관측값을 잠재 공간으로 압축
-- **잠재 변수**: z ~ N(μ, σ²) 샘플링
-- **디코더**: Transformer 기반 액션 시퀀스 생성
-- **출력**: 미래 k개의 액션 시퀀스
-
-### 주요 하이퍼파라미터
-
-| 파라미터 | 기본값 | 설명 |
-|---------|--------|------|
-| chunk_size | 100 | 예측할 액션 수 |
-| n_encoder_layers | 4 | 인코더 레이어 수 |
-| n_decoder_layers | 7 | 디코더 레이어 수 |
-| hidden_dim | 512 | 은닉층 차원 |
-| kl_weight | 10.0 | KL divergence 가중치 |
-
-## 성능 최적화
-
-### 학습 효율성
-
-<Callout type="tip" title="학습 시간">
-  - **RTX 2080 Ti**: ~5시간
-  - **RTX 3090**: ~3시간
-  - **A100**: ~1.5시간
-</Callout>
-
-### 추론 속도
-- 추론 시간: 0.01초 (100Hz 제어 가능)
-- 메모리 사용: ~2GB GPU 메모리
 
 ## SmolVLA와의 비교
 
@@ -168,7 +126,7 @@ ACT는 Conditional Variational Autoencoder (CVAE) 구조를 사용합니다:
 
 ## 실제 성능
 
-### 검증된 작업들
+### 검증된 작업들 (ALOHA 기준...)
 - **배터리 삽입**: 90% 성공률
 - **벨크로 부착**: 85% 성공률
 - **물체 집어 담기**: 95% 성공률
@@ -179,45 +137,6 @@ ACT는 Conditional Variational Autoencoder (CVAE) 구조를 사용합니다:
   - **빠른 학습**: 제한된 데이터로 높은 성능 달성
   - **실시간 제어**: 100Hz 제어 루프 지원
 </Callout>
-
-## 문제 해결
-
-### 일반적인 이슈
-
-<Callout type="warning" title="액션이 떨리는 경우">
-  **해결책**:
-  - Temporal ensembling 가중치 조정
-  - Chunk size 증가 (100 → 150)
-  - 학습률 감소
-</Callout>
-
-<Callout type="danger" title="과적합 발생">
-  **해결책**:
-  - 데이터 증강 적용
-  - KL weight 증가 (10 → 15)
-  - Dropout 추가
-</Callout>
-
-## 고급 기법
-
-### 멀티태스크 학습
-```bash
-# 여러 작업을 하나의 모델로
-python -m lerobot.scripts.train \
-    --dataset.repo_id=${HF_USER}/multitask_dataset \
-    --policy.type=act \
-    --policy.task_conditioning=true \
-    --training.num_epochs=200
-```
-
-### 도메인 적응
-```bash
-# 사전 학습된 모델 파인튜닝
-python -m lerobot.scripts.train \
-    --policy.pretrained_path=lerobot/act_base \
-    --dataset.repo_id=${HF_USER}/new_task \
-    --training.num_epochs=50
-```
 
 ## 추가 리소스
 
