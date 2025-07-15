@@ -27,41 +27,44 @@ SO-101은 RobotStudio와 Hugging Face가 협력하여 개발한 오픈소스 로
 <Tabs tabs={['SO-101 시스템','예산 계획']}>
   <div class="tab-panel">
     ### 리더 암 (Leader Arm)
-    - 6x STS3215 서보 모터 (약 25,000원 x6)
+    - 6x STS3215 서보 모터 (중국 국내가격 약 20,000원 x6)
     - STServo 드라이버 보드
     - 7.4V 전원 공급장치
     - 3D 프린팅 파츠
     - **예상 비용**: 약 25만원
     
     ### 팔로워 암 (Follower Arm)
-    - 6x STS3215 서보 모터 (약 25,000원 x6)
+    - 6x STS3215 서보 모터 (중국 국내가격 약 20,000원 x6)
     - STServo 드라이버 보드
     - 7.4V 전원 공급장치
     - 3D 프린팅 파츠
     - **예상 비용**: 약 25만원
     
-    **총 시스템 비용**: 약 50-60만원
+    **총 시스템 비용**: 약 50만원
+
+    Seeed Studio 나 Wowrobo 에서 키트를 주문 할 수 있습니다, 관세, 배송비 다 고려하면 약 50만원 수준에서 중국 직구가 가능합니다.
     
     <Callout type="info" title="필자 의견">
-      SO-101은 Feetech 서보를 사용하여 Dynamixel보다 저렴하면서도 안정적인 성능을 제공합니다.
+      SO-101은 Feetech 서보를 사용하여 Dynamixel보다 저렴하면서도 스펙상 동일한 토크를 제공합니다.
       특히 1/345 기어비의 리더 암은 사람이 조작하기 매우 편하게 설계되었습니다.
       한국에서는 AliExpress나 직구로 서보를 구매하는 것이 경제적입니다.
+
+      다만 문제가 여러가지 있습니다. 제품이 QC가 안 되어 있어요. 복불복이 많습니다. 여분의 모터를 주문하는 것을 추천드립니다.  
+      내구도도 더 안 좋아 보입니다. 사용하다보면 고장나는 경우를 여러번 봤습니다.  
+      Dynamixel 의 특허 침해 이슈가 있습니다. (실제 특허 침해 여부는 제가 판단할 능력이 없습니다.)
+      중국 외 지사가 없어서 A/S 대응이 어렵습니다. 
     </Callout>
   </div>
   <div class="tab-panel">
     ### 단계별 구매 계획
     
-    **1단계**: 기본 세트 (약 30만원)
-    - 리더 암용 서보 6개
-    - 드라이버 보드 1개
+    **1단계**: 기본 세트 (약 50만원)
+    - 리더, 팔로워 암용 서보 12개
+    - 드라이버 보드 2개
     - 전원 공급장치
     
-    **2단계**: 팔로워 추가 (약 30만원)
-    - 팔로워 암용 서보 6개
-    - 추가 드라이버 보드
-    
-    **3단계**: 확장 옵션 (약 10-20만원)
-    - 카메라 및 마운트
+    **2단계**: 확장 옵션 (약 10 ~ 만원)
+    - 카메라 및 마운트, 오픈 소스로 여러 에드온 설계도가 있습니다. 
     - 추가 센서
   </div>
 </Tabs>
@@ -96,9 +99,8 @@ SO-101은 RobotStudio와 Hugging Face가 협력하여 개발한 오픈소스 로
 
 <Callout type="warning">
   전원 사양에 주의하세요:
-  - **전압**: 7.4V (2S LiPo 또는 안정적인 DC 전원)
-  - **전류**: 최소 5A 이상 권장
-  - **커넥터**: XT60 또는 동급
+  - **전압**: 7.4V (안정적인 DC 전원, 낮춰도 됨. 12V 옵션도 있음)
+  - **전류**: 5A 이상 권장
 </Callout>
 
 ## 🚀 소프트웨어 설정
@@ -111,11 +113,6 @@ uv pip install -e ".[feetech]"
 
 # 로봇 연결 확인
 python -m lerobot.scripts.find_devices
-
-# 캘리브레이션
-python -m lerobot.scripts.control_robot \
-    --robot-path lerobot/configs/robot/so100.yaml \
-    --calibrate
 ```
 
 ### 서보 디버깅
@@ -127,17 +124,12 @@ python -m lerobot.scripts.control_robot \
     - 서보 ID, 속도, 위치 설정 가능
   </div>
   <div class="tab-panel">
-    ```bash
-    # pyserial 기반 디버깅 툴
-    pip install pyserial
-    python -m lerobot.scripts.debug_servo
-    ```
+    펌웨어 버전이나 설정 툴은 따로 없어서 직접 통신해야함. 권장하지 않음.
   </div>
 </Tabs>
 
 ### 실제 응용
 - 물체 조작 및 픽앤플레이스 작업
-- 정밀 조립 작업
 - AI 모델 학습을 위한 데이터 수집
 - 연구 및 교육 플랫폼
 
@@ -151,9 +143,9 @@ python -m lerobot.scripts.control_robot \
 ### 선택적 업그레이드
 - **오버헤드 카메라 마운트**: 작업 공간 전체 뷰
 - **손목 카메라**: 정밀한 작업을 위한 근접 뷰
-- **촉각 센싱**: 물체 접촉 감지
 - **컴플라이언트 그리퍼**: 부드러운 파지
 - **베이스 마운트 옵션**: 안정적인 설치
+- **모바일 베이스**: LeKiwi
 
 ## 📚 리소스
 
@@ -168,7 +160,8 @@ python -m lerobot.scripts.control_robot \
 - [HuggingFace Discord LeRobot 채널](https://discord.com/invite/s3KuuzsPFb)
 
 <Callout type="success">
-  SO-101은 초보자부터 전문가까지 모두에게 적합한 로봇 플랫폼입니다.
+  SO-101은 초보자부터 전문가까지 모두에게 적합한 저가형 로봇 플랫폼입니다.
+  하드웨어 측면에서는 장난감 수준이 맞긴 합니다.
   활발한 오픈소스 커뮤니티가 지속적으로 개선하고 있으며, 여러분의 기여도 환영합니다!
 </Callout>
 
