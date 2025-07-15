@@ -32,10 +32,10 @@ ACT는 Stanford에서 개발한 알고리즘으로, 다음과 같은 핵심 혁�
 
 ```python
 # 기존 방식: 단일 액션 예측
-action_t = policy(observation_t)
+action = policy(observation)
 
 # ACT: 액션 시퀀스 예측
-action_sequence = policy(observation_t)  # [a_t, a_{t+1}, ..., a_{t+k-1}]
+action_sequence = policy(observation)  # [a[t], a[t+1], ..., a[t+k-1]]
 ```
 
 ### Temporal Ensembling
@@ -43,9 +43,9 @@ action_sequence = policy(observation_t)  # [a_t, a_{t+1}, ..., a_{t+k-1}]
 
 <Callout type="info" title="작동 원리">
   시간 t에서 여러 정책 쿼리의 예측을 결합:
-  - t-2에서 예측한 a_t
-  - t-1에서 예측한 a_t
-  - t에서 예측한 a_t
+  - 시간 (t-2)에서 예측한 액션
+  - 시간 (t-1)에서 예측한 액션  
+  - 현재 시간 t에서 예측한 액션
   
   이들을 exponential weighting으로 평균하여 최종 액션 결정
 </Callout>
