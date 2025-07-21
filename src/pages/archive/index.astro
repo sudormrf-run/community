@@ -11,13 +11,16 @@ import Layout from '../../layouts/Layout.astro';
       <h2>예정된 행사</h2>
       <div class="horizontal-scroll">
         <div class="events-grid">
-          <div class="event-card upcoming">
-            <div class="coming-soon-badge">Coming Soon</div>
-            <div class="event-info">
-              <h3>Physical AI Meetup with Robotis</h3>
-              <p class="event-date-text">2025년 8월 중</p>
+          <a href="/events/2025/physical-ai-workshop" class="event-card-link">
+            <div class="event-card upcoming">
+              <img src="/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop" />
+              <div class="event-info">
+                <h3>Physical AI Workshop</h3>
+                <p class="event-date-text">2025년 8월 14일 (목) 14:00-18:00</p>
+                <p class="event-location">로보티즈 캠퍼스</p>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </section>
@@ -108,10 +111,22 @@ import Layout from '../../layouts/Layout.astro';
     background: var(--secondary-color);
     border: 2px solid var(--accent-color);
     border-radius: 0.5rem;
-    padding: 1rem;
-    width: 300px; /* Set a fixed width for smaller card */
-    display: inline-block; /* Allow horizontal scrolling */
-    vertical-align: top; /* Align to top for inline-block */
+    overflow: hidden;
+    width: 350px;
+    display: inline-block;
+    vertical-align: top;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .event-card.upcoming:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 20px rgba(253, 115, 24, 0.3);
+  }
+
+  .event-card.upcoming img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
   }
 
   .event-card.upcoming .event-info h3 {
@@ -125,7 +140,18 @@ import Layout from '../../layouts/Layout.astro';
   }
 
   .event-card.upcoming .event-info {
-    padding: 0; /* Remove padding from event-info */
+    padding: 1rem;
+  }
+
+  .event-card.upcoming .event-location {
+    font-size: 0.85rem;
+    color: var(--color-green);
+    margin-top: 0.25rem;
+  }
+
+  .event-card-link {
+    text-decoration: none;
+    color: inherit;
   }
 
   /* 지난 행사 */
@@ -319,6 +345,10 @@ import Layout from '../../layouts/Layout.astro';
     .coming-soon-badge {
       padding: 0.25rem 0.5rem;
       font-size: 0.7rem;
+    }
+    
+    .event-card.upcoming {
+      width: 280px;
     }
   }
 </style>
