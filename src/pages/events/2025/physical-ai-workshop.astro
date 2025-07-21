@@ -4,20 +4,19 @@ import Layout from '../../../layouts/Layout.astro';
 
 <Layout title="Physical AI Workshop">
   <div class="workshop-container">
-    <div class="hero-section">
-      <div class="poster-container">
-        <img src="/community/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop Poster" class="poster" />
+    <div class="hero-info">
+      <h1>Physical AI Workshop</h1>
+      <div class="event-details">
+        <p class="date">🗓️ 2025년 8월 14일 (목) 14:00-18:00</p>
+        <p class="location">📍 로보티즈 캠퍼스 + 유튜브 라이브</p>
       </div>
-      <div class="hero-content">
-        <h1>Physical AI Workshop</h1>
-        <div class="event-details">
-          <p class="date">🗓️ 2025년 8월 14일 (목) 14:00-18:00</p>
-          <p class="location">📍 로보티즈 캠퍼스 + 유튜브 라이브</p>
-        </div>
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLSff0Sh3kSIl31J6mj4DX-Q5n5DCl9LYnqH3ZsTN3K8gydznXA/viewform?usp=sharing&ouid=109247284085622604521" target="_blank" rel="noopener noreferrer" class="register-btn">
-          참가 신청하기
-        </a>
-      </div>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSff0Sh3kSIl31J6mj4DX-Q5n5DCl9LYnqH3ZsTN3K8gydznXA/viewform?usp=sharing&ouid=109247284085622604521" target="_blank" rel="noopener noreferrer" class="register-btn">
+        참가 신청하기
+      </a>
+    </div>
+    
+    <div class="poster-section">
+      <img src="/community/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop Poster" class="poster" />
     </div>
 
     <section class="event-info">
@@ -43,23 +42,39 @@ import Layout from '../../../layouts/Layout.astro';
         
         <div class="speaker-card">
           <h3>로봇 스타트업에서<br/>바라보는 Physical AI</h3>
-          <p class="speaker-name">하영엽 대표</p>
-          <p class="speaker-info">See&Grip 대표<br/>前 삼성중공업 엔지니어<br/>산업계측제어기술사</p>
+          <p class="speaker-name">하영열 대표</p>
+          <p class="speaker-info">SEENGRIP 대표<br/>前 삼성중공업 엔지니어<br/>산업계측제어기술사</p>
         </div>
         
         <div class="speaker-card">
           <h3>Physical AI 시대를<br/>준비하는 논의 (Q&A)</h3>
-          <p class="speaker-name">박종현 컨설턴트</p>
-          <p class="speaker-info">MS, 현대차 등과 AI로봇 프로젝트 수행<br/>삼성/SK 외 기관에서 AI 컨설팅 수행</p>
+          <p class="speaker-name">박종현 대표</p>
+          <p class="speaker-info">수도리무브 대표<br/>MS, 현대차 등과 AI로봇 프로젝트 수행<br/>삼성/SK 외 기관에서 AI 컨설팅 수행</p>
         </div>
       </div>
     </section>
 
     <section class="hands-on">
       <h2>특별 전시</h2>
-      <div class="robot-preview">
-        <h3>로보티즈 견학 및 시연</h3>
-        <p>Physical AI 구현을 위한 최신 로봇 기술 및 제품 전시</p>
+      <div class="video-grid">
+        <div class="video-card">
+          <iframe 
+            src="https://www.youtube.com/embed/WNpRlIr4zbw"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+          <p>로보티즈 제품 소개</p>
+        </div>
+        <div class="video-card">
+          <iframe 
+            src="https://www.youtube.com/embed/3x-eN36pNns"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+          <p>Physical AI 기술 시연</p>
+        </div>
       </div>
     </section>
 
@@ -73,7 +88,7 @@ import Layout from '../../../layouts/Layout.astro';
 
     <section class="host-info">
       <h2>주최</h2>
-      <p><strong>PAIS</strong> (Physical AI Innovation Series)</p>
+      <p><strong>SUDOREMOVE</strong> · <strong>SK마이써니</strong> · <strong>ROBOTIS</strong></p>
     </section>
   </div>
 </Layout>
@@ -101,37 +116,30 @@ import Layout from '../../../layouts/Layout.astro';
     color: var(--text-color);
   }
 
-  .hero-section {
-    display: flex;
-    gap: 3rem;
-    margin-bottom: 4rem;
-    align-items: flex-start;
+  .hero-info {
+    text-align: center;
+    margin-bottom: 3rem;
   }
 
-  .poster-container {
-    flex: 0 0 auto;
-    max-width: 400px;
-    width: 100%;
-  }
-
-  .poster {
-    width: 100%;
-    height: auto;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    display: block;
-  }
-
-  .hero-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .hero-content h1 {
+  .hero-info h1 {
     font-size: 2.5rem;
     color: var(--color-green);
     margin-bottom: 1.5rem;
     line-height: 1.2;
+  }
+
+  .poster-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 4rem;
+  }
+
+  .poster {
+    max-width: 500px;
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
 
   .event-details {
@@ -214,16 +222,33 @@ import Layout from '../../../layouts/Layout.astro';
     line-height: 1.5;
   }
 
-  .robot-preview {
-    background: var(--secondary-color);
-    border-radius: 0.5rem;
-    padding: 2rem;
-    text-align: center;
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
   }
 
-  .robot-preview h3 {
+  .video-card {
+    background: var(--secondary-color);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+
+  .video-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .video-card iframe {
+    width: 100%;
+    height: 250px;
+  }
+
+  .video-card p {
+    padding: 1rem;
+    text-align: center;
     color: var(--color-green);
-    margin-bottom: 1rem;
+    font-weight: bold;
   }
 
   .registration {
@@ -258,18 +283,8 @@ import Layout from '../../../layouts/Layout.astro';
   }
 
   @media (max-width: 968px) {
-    .hero-section {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .poster-container {
-      max-width: 300px;
-      margin-bottom: 2rem;
-    }
-
-    .hero-content {
-      text-align: center;
+    .poster {
+      max-width: 400px;
     }
   }
 
@@ -287,8 +302,12 @@ import Layout from '../../../layouts/Layout.astro';
       grid-template-columns: 1fr;
     }
 
-    .poster-container {
-      max-width: 250px;
+    .poster {
+      max-width: 300px;
+    }
+
+    .video-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>
