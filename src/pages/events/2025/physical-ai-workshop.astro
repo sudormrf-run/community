@@ -5,7 +5,9 @@ import Layout from '../../../layouts/Layout.astro';
 <Layout title="Physical AI Workshop">
   <div class="workshop-container">
     <div class="hero-section">
-      <img src="/community/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop Poster" class="poster" />
+      <div class="poster-container">
+        <img src="/community/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop Poster" class="poster" />
+      </div>
       <div class="hero-content">
         <h1>Physical AI Workshop</h1>
         <div class="event-details">
@@ -100,11 +102,16 @@ import Layout from '../../../layouts/Layout.astro';
   }
 
   .hero-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
     gap: 3rem;
     margin-bottom: 4rem;
-    align-items: center;
+    align-items: flex-start;
+  }
+
+  .poster-container {
+    flex: 0 0 auto;
+    max-width: 400px;
+    width: 100%;
   }
 
   .poster {
@@ -112,12 +119,19 @@ import Layout from '../../../layouts/Layout.astro';
     height: auto;
     border-radius: 0.5rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    display: block;
+  }
+
+  .hero-content {
+    flex: 1;
+    min-width: 0;
   }
 
   .hero-content h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     color: var(--color-green);
     margin-bottom: 1.5rem;
+    line-height: 1.2;
   }
 
   .event-details {
@@ -243,14 +257,26 @@ import Layout from '../../../layouts/Layout.astro';
     color: var(--text-muted);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 968px) {
     .hero-section {
-      grid-template-columns: 1fr;
-      text-align: center;
+      flex-direction: column;
+      align-items: center;
     }
 
+    .poster-container {
+      max-width: 300px;
+      margin-bottom: 2rem;
+    }
+
+    .hero-content {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+
     .hero-content h1 {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
 
     .event-details p {
@@ -259,6 +285,10 @@ import Layout from '../../../layouts/Layout.astro';
 
     .speakers-grid {
       grid-template-columns: 1fr;
+    }
+
+    .poster-container {
+      max-width: 250px;
     }
   }
 </style>
