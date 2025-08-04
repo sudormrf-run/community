@@ -10,9 +10,13 @@ import Layout from '../../../layouts/Layout.astro';
         <p class="date">🗓️ 2025년 8월 14일 (목) 14:00-18:00</p>
         <p class="location">📍 로보티즈 사옥 + 유튜브 라이브</p>
       </div>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSff0Sh3kSIl31J6mj4DX-Q5n5DCl9LYnqH3ZsTN3K8gydznXA/viewform?usp=sharing&ouid=109247284085622604521" target="_blank" rel="noopener noreferrer" class="register-btn">
-        참가 신청하기
-      </a>
+      <div class="registration-notice">
+        <p class="closed-notice">⚠️ 참가 신청이 마감되었습니다</p>
+        <p>유튜브 라이브로 함께해주세요!</p>
+        <a href="https://www.youtube.com/live/Vqk7rdlqSdE" target="_blank" rel="noopener noreferrer" class="youtube-live-btn">
+          🔴 유튜브 라이브 시청하기
+        </a>
+      </div>
     </div>
     
     <div class="poster-section">
@@ -80,10 +84,13 @@ import Layout from '../../../layouts/Layout.astro';
 
     <section class="registration">
       <h2>참가 신청</h2>
-      <p>Physical AI의 미래를 함께 만들어갈 분들의 많은 참여 부탁드립니다.</p>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSff0Sh3kSIl31J6mj4DX-Q5n5DCl9LYnqH3ZsTN3K8gydznXA/viewform?usp=sharing&ouid=109247284085622604521" target="_blank" rel="noopener noreferrer" class="register-btn-large">
-        참가 신청 바로가기
-      </a>
+      <div class="registration-closed">
+        <p class="closed-notice-large">⚠️ 참가 신청이 마감되었습니다</p>
+        <p>Physical AI의 미래를 함께 만들어갈 분들을 위해 유튜브 라이브를 준비했습니다.</p>
+        <a href="https://www.youtube.com/live/Vqk7rdlqSdE" target="_blank" rel="noopener noreferrer" class="youtube-live-btn-large">
+          🔴 유튜브 라이브로 시청하기
+        </a>
+      </div>
     </section>
 
     <section class="host-info">
@@ -280,6 +287,70 @@ import Layout from '../../../layouts/Layout.astro';
   .host-info {
     text-align: center;
     color: var(--text-muted);
+  }
+
+  .registration-notice {
+    text-align: center;
+    background: rgba(253, 115, 24, 0.1);
+    border: 1px solid rgba(253, 115, 24, 0.3);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .closed-notice {
+    color: var(--accent-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .closed-notice-large {
+    color: var(--accent-color);
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .youtube-live-btn {
+    display: inline-block;
+    background: #ff0000;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    transition: all 0.3s;
+  }
+
+  .youtube-live-btn:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+  }
+
+  .youtube-live-btn-large {
+    display: inline-block;
+    background: #ff0000;
+    color: white;
+    padding: 1.5rem 3rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 1.5rem;
+    transition: all 0.3s;
+  }
+
+  .youtube-live-btn-large:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+  }
+
+  .registration-closed {
+    text-align: center;
   }
 
   @media (max-width: 968px) {

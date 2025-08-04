@@ -15,11 +15,12 @@ const pastEvents = [
 
 const upcomingEvents = [
   {
-    title: "Coming Soon",
-    date: "TBA",
-    description: "다음 행사를 기대해주세요!",
-    image: "/images/events/coming-soon.jpg",
-    link: "#"
+    title: "Physical AI Workshop",
+    date: "2025년 8월 14일",
+    description: "로보티즈와 함께하는 Physical AI 워크샵. 참가신청은 마감되었으며, 유튜브 라이브로 시청 가능합니다.",
+    image: "/community/events/2025/physical-ai-workshop-poster.png",
+    link: "/community/events/2025/physical-ai-workshop",
+    youtubeLink: "https://www.youtube.com/live/Vqk7rdlqSdE"
   }
 ];
 ---
@@ -58,16 +59,23 @@ const upcomingEvents = [
     <h2>예정된 행사</h2>
     <div class="events-grid">
       {upcomingEvents.map(event => (
-        <a href={event.link} class="event-card-link">
-          <div class="event-card upcoming">
-            <img src={event.image} alt={event.title} />
-            <div class="event-info">
-              <h3>{event.title}</h3>
-              <p class="event-date-text">{event.date}</p>
-              <p>{event.description}</p>
+        <div class="event-card-wrapper">
+          <a href={event.link} class="event-card-link">
+            <div class="event-card upcoming">
+              <img src={event.image} alt={event.title} />
+              <div class="event-info">
+                <h3>{event.title}</h3>
+                <p class="event-date-text">{event.date}</p>
+                <p>{event.description}</p>
+                {event.youtubeLink && (
+                  <a href={event.youtubeLink} target="_blank" rel="noopener noreferrer" class="youtube-link">
+                    🔴 유튜브 라이브 시청하기
+                  </a>
+                )}
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        </div>
       ))}
     </div>
   </div>
@@ -172,5 +180,23 @@ const upcomingEvents = [
     left: 0;
     width: 100%;
     height: 100%;
+  }
+
+  .youtube-link {
+    display: inline-block;
+    background: #ff0000;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 1rem;
+    transition: all 0.3s;
+  }
+
+  .youtube-link:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
   }
 </style>
