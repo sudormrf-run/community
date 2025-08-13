@@ -27,6 +27,22 @@ import Layout from '../../layouts/Layout.astro';
         </a>
       </div>
     </section>
+
+    <section class="docs-section">
+      <h2>슬라이드 아카이브</h2>
+      <div class="docs-grid">
+        <a href="#" class="doc-card slide-card">
+          <h3>📚 LLM 파인튜닝</h3>
+          <p>2024~ 교육자료</p>
+          <span class="slide-badge">교육자료</span>
+        </a>
+        <a href="#" class="doc-card slide-card">
+          <h3>🚀 HuggingFace의 Action Data Scaling</h3>
+          <p>2025.08.15 AI Robotics Korea 발표자료</p>
+          <span class="slide-badge">발표자료</span>
+        </a>
+      </div>
+    </section>
   </div>
 </Layout>
 
@@ -159,6 +175,29 @@ import Layout from '../../layouts/Layout.astro';
   .doc-card.external-link:hover .external-icon {
     opacity: 1;
     transform: translate(2px, -2px);
+  }
+
+  /* 슬라이드 카드 스타일 */
+  .doc-card.slide-card {
+    position: relative;
+    padding-bottom: var(--spacing-10);
+  }
+
+  .slide-badge {
+    position: absolute;
+    bottom: var(--spacing-4);
+    left: var(--spacing-6);
+    font-size: var(--text-sm);
+    padding: var(--spacing-1) var(--spacing-3);
+    background: var(--color-accent);
+    color: var(--color-background);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-medium);
+  }
+
+  .doc-card.slide-card:hover .slide-badge {
+    background: var(--color-yellow);
+    color: var(--color-background);
   }
 
 
