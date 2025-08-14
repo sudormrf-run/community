@@ -30,6 +30,17 @@ const upcomingEvents = [
     <h1>이벤트</h1>
     <p class="subtitle">Sudoremove의 최신 소식과 이벤트</p>
 
+    <div class="notice-section">
+      <div class="notice-card">
+        <span class="notice-badge">📢 공지</span>
+        <h3>LeRobot 커뮤니티에 참여하세요!</h3>
+        <p>카카오톡 오픈채팅방에서 LeRobot 프로젝트 관련 소식과 정보를 공유합니다.</p>
+        <a href="https://open.kakao.com/o/gDyJjDIg" target="_blank" rel="noopener noreferrer" class="kakao-link">
+          💬 카카오톡 LeRobot 오픈채팅방 참여하기
+        </a>
+      </div>
+    </div>
+
     <h2>지난 행사</h2>
     <div class="events-grid">
       {pastEvents.map(event => (
@@ -198,5 +209,94 @@ const upcomingEvents = [
     background: #cc0000;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+  }
+
+  .notice-section {
+    margin: 2rem 0 3rem 0;
+  }
+
+  .notice-card {
+    background: linear-gradient(135deg, rgba(253, 115, 24, 0.1), rgba(67, 214, 168, 0.1));
+    border: 2px solid #fd7318;
+    border-radius: 1rem;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .notice-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #fd7318, #ffc107, #43d6a8);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
+  }
+
+  .notice-badge {
+    display: inline-block;
+    background: #fd7318;
+    color: #0d030f;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .notice-card h3 {
+    color: #43d6a8;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+  }
+
+  .notice-card p {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .kakao-link {
+    display: inline-block;
+    background: #fee500;
+    color: #3c1e1e;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+    font-size: 1rem;
+  }
+
+  .kakao-link:hover {
+    background: #fdd835;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(254, 229, 0, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    .notice-card {
+      padding: 1.5rem;
+    }
+
+    .notice-card h3 {
+      font-size: 1.25rem;
+    }
+
+    .notice-card p {
+      font-size: 1rem;
+    }
+
+    .kakao-link {
+      display: block;
+      text-align: center;
+    }
   }
 </style>
