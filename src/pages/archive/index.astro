@@ -122,10 +122,8 @@ import Layout from '../../layouts/Layout.astro';
     border-radius: 0.5rem;
     overflow: hidden;
     transition: transform 0.3s;
-    background-image: url('/community/events/2025/physical-ai-workshop-poster-logo.png');
-    background-size: cover;
-    background-position: center;
-    background-color: #000;
+    background: linear-gradient(135deg, rgba(253, 115, 24, 0.1), rgba(67, 214, 168, 0.1));
+    border: 2px solid var(--accent-color);
     height: 200px;
     width: 400px;
     display: inline-block;
@@ -140,9 +138,14 @@ import Layout from '../../layouts/Layout.astro';
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.8) 100%);
-    z-index: 1;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), #ffc107, var(--color-green));
+    animation: shimmer 3s ease-in-out infinite;
+  }
+  
+  @keyframes shimmer {
+    0%, 100% { transform: translateX(-100%); }
+    50% { transform: translateX(100%); }
   }
 
   .event-card.upcoming:hover {
@@ -154,7 +157,6 @@ import Layout from '../../layouts/Layout.astro';
     z-index: 2;
     padding: 1rem;
     width: 100%;
-    background: rgba(0, 0, 0, 0.3);
   }
 
   .event-card.upcoming .event-info h3 {
