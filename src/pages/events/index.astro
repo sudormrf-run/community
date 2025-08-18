@@ -4,6 +4,14 @@ import Layout from '../../layouts/Layout.astro';
 
 const pastEvents = [
   {
+    title: "Physical AI Workshop",
+    date: "2025년 8월 14일",
+    description: "로보티즈와 함께한 Physical AI 워크샵. AI 로봇의 실제 구현과 활용에 대해 다뤘습니다.",
+    image: "/community/events/2025/physical-ai-workshop-poster.png",
+    link: "/community/events/2025/physical-ai-workshop",
+    youtubeId: "Vqk7rdlqSdE"
+  },
+  {
     title: "HuggingFace LeRobot Hackathon",
     date: "2024년 6월 22일",
     description: "HuggingFace와 함께한 LeRobot 해커톤. 로봇을 직접 만들고 프로그래밍하며 AI의 물리적 구현을 경험했습니다.",
@@ -15,12 +23,13 @@ const pastEvents = [
 
 const upcomingEvents = [
   {
-    title: "Physical AI Workshop",
-    date: "2025년 8월 14일",
-    description: "로보티즈와 함께하는 Physical AI 워크샵. 참가신청은 마감되었으며, 유튜브 라이브로 시청 가능합니다.",
-    image: "/community/events/2025/physical-ai-workshop-poster.png",
-    link: "/community/events/2025/physical-ai-workshop",
-    youtubeLink: "https://www.youtube.com/live/Vqk7rdlqSdE"
+    title: "LeRobot Tutorial",
+    date: "2025년 연말 예정",
+    description: "LeRobot을 활용한 실습 중심의 튜토리얼. 로봇 제어와 AI 학습의 기초부터 응용까지 다룹니다.",
+    image: "/images/events/coming-soon.jpg",
+    link: "#",
+    location: "장소 미정",
+    isPreparing: true
   }
 ];
 ---
@@ -71,13 +80,21 @@ const upcomingEvents = [
     <div class="events-grid">
       {upcomingEvents.map(event => (
         <div class="event-card-wrapper">
-          <a href={event.link} class="event-card-link">
+          <a 
+            href={event.isPreparing ? "#" : event.link} 
+            class="event-card-link"
+            onclick={event.isPreparing ? "alert('아직 준비중입니다. 곧 공개될 예정이니 기대해주세요!'); return false;" : ""}
+          >
             <div class="event-card upcoming">
               <img src={event.image} alt={event.title} />
               <div class="event-info">
                 <h3>{event.title}</h3>
                 <p class="event-date-text">{event.date}</p>
+                {event.location && <p class="event-location">📍 {event.location}</p>}
                 <p>{event.description}</p>
+                {event.isPreparing && (
+                  <span class="preparing-badge">준비중</span>
+                )}
                 {event.youtubeLink && (
                   <a href={event.youtubeLink} target="_blank" rel="noopener noreferrer" class="youtube-link">
                     🔴 유튜브 라이브 시청하기
@@ -209,6 +226,23 @@ const upcomingEvents = [
     background: #cc0000;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+  }
+
+  .event-location {
+    color: #43d6a8;
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .preparing-badge {
+    display: inline-block;
+    background: #ffc107;
+    color: #000;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-top: 0.75rem;
   }
 
   .notice-section {
