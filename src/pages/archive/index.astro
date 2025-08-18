@@ -33,8 +33,8 @@ import Layout from '../../layouts/Layout.astro';
       <div class="horizontal-scroll">
         <div class="events-grid">
           <a href="/community/events/2025/physical-ai-workshop" class="event-card-link">
-            <div class="event-card past">
-              <img src="/community/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop" />
+            <div class="event-card past physical-ai-workshop">
+              <img src="/community/events/2025/physical-ai-workshop-poster-logo.png" alt="Physical AI Workshop" />
               <div class="event-info">
                 <h3>Physical AI Workshop</h3>
                 <p class="event-date-text">2025년 8월 14일</p>
@@ -222,12 +222,15 @@ import Layout from '../../layouts/Layout.astro';
     border-radius: 0.5rem;
     overflow: hidden;
     transition: transform 0.3s;
-    background-image: url('/images/events/lerobot-hackathon.jpeg');
     background-size: cover;
     background-position: center;
     height: 200px; /* Fixed height for the card */
     display: flex;
     align-items: flex-end; /* Align content to the bottom */
+  }
+  
+  .event-card.past.physical-ai-workshop {
+    background-image: url('/community/events/2025/physical-ai-workshop-poster-logo.png');
   }
 
   .event-card.past::before {
