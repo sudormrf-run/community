@@ -11,12 +11,14 @@ import Layout from '../../layouts/Layout.astro';
       <h2>예정된 행사</h2>
       <div class="horizontal-scroll">
         <div class="events-grid">
-          <a href="/community/events/2025/physical-ai-workshop" class="event-card-link">
+          <a href="#" class="event-card-link" onclick="alert('아직 준비중입니다. 곧 공개될 예정이니 기대해주세요!'); return false;">
             <div class="event-card upcoming">
               <div class="event-info">
-                <h3>Physical AI Workshop</h3>
-                <p class="event-date-text">2025년 8월 14일 (목) 14:00-18:00</p>
-                <p class="event-location">로보티즈 사옥</p>
+                <h3>LeRobot Tutorial</h3>
+                <p class="event-date-text">2025년 연말 예정</p>
+                <p class="event-location">장소 미정</p>
+                <p class="event-description">LeRobot을 활용한 실습 중심의 튜토리얼</p>
+                <span class="preparing-badge">준비중</span>
               </div>
             </div>
           </a>
@@ -30,6 +32,15 @@ import Layout from '../../layouts/Layout.astro';
       <h2>지난 행사</h2>
       <div class="horizontal-scroll">
         <div class="events-grid">
+          <a href="/community/events/2025/physical-ai-workshop" class="event-card-link">
+            <div class="event-card past">
+              <img src="/community/events/2025/physical-ai-workshop-poster.png" alt="Physical AI Workshop" />
+              <div class="event-info">
+                <h3>Physical AI Workshop</h3>
+                <p class="event-date-text">2025년 8월 14일</p>
+              </div>
+            </div>
+          </a>
           <a href="https://sudormrf.run/2025/06/24/huggingface-lerobot-hackathon-review/" class="event-card-link" target="_blank" rel="noopener noreferrer">
             <div class="event-card past">
               <img src="/images/events/lerobot-hackathon.jpeg" alt="HuggingFace LeRobot Hackathon" />
@@ -168,6 +179,24 @@ import Layout from '../../layouts/Layout.astro';
     font-size: 0.75rem;
     color: var(--accent-color);
     margin-top: 0.25rem;
+  }
+
+  .event-card.upcoming .event-description {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    line-height: 1.4;
+  }
+
+  .preparing-badge {
+    display: inline-block;
+    background: #ffc107;
+    color: #000;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-top: 0.75rem;
   }
 
   .event-card.upcoming img {
